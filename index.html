@@ -1,0 +1,2836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>王者荣耀 · 峡谷攻略站</title>
+<style>
+/* ===== 基础重置 & 变量 ===== */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --neon-blue: #00d4ff;
+  --neon-purple: #b44aff;
+  --neon-pink: #ff2d78;
+  --gold: #ffd700;
+  --gold2: #ff9f1c;
+  --bg0: #04050d;
+  --bg1: #080b18;
+  --bg2: #0d1224;
+  --bg3: #111830;
+  --card: #0e1628;
+  --card2: #131c35;
+  --text: #e8eeff;
+  --text2: #8a9cc4;
+  --border: rgba(0,212,255,0.15);
+  --border2: rgba(180,74,255,0.2);
+  --font: 'Microsoft YaHei','PingFang SC',sans-serif;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg0);
+  color: var(--text);
+  font-family: var(--font);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+a { text-decoration: none; color: inherit; }
+img { max-width: 100%; }
+
+/* ===== 扫描线全局背景 ===== */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0,212,255,0.012) 3px,
+    rgba(0,212,255,0.012) 4px
+  );
+  pointer-events:none;
+  z-index:9999;
+}
+
+/* ===== 导航栏 ===== */
+#navbar {
+  position: fixed; top:0; left:0; right:0; z-index:1000;
+  height: 62px;
+  background: rgba(4,5,13,0.88);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(0,212,255,0.18);
+  display: flex; align-items: center;
+  padding: 0 5vw;
+  gap: 0;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  margin-right: 44px; cursor:pointer;
+}
+.nav-logo-hex {
+  width:36px; height:36px; position:relative;
+  display:flex; align-items:center; justify-content:center;
+}
+.nav-logo-hex svg { width:36px; height:36px; position:absolute; }
+.nav-logo-text {
+  font-size:17px; font-weight:900; letter-spacing:2px;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.nav-links {
+  display:flex; gap:2px; list-style:none; flex:1;
+}
+.nav-links li a {
+  display:block; padding:8px 20px;
+  font-size:14px; font-weight:600; letter-spacing:1px;
+  color: var(--text2);
+  border-radius:6px;
+  transition: all .2s;
+  position:relative;
+}
+.nav-links li a::after {
+  content:''; position:absolute; bottom:4px; left:50%; transform:translateX(-50%) scaleX(0);
+  width:20px; height:2px;
+  background: linear-gradient(90deg,var(--neon-blue),var(--neon-purple));
+  border-radius:1px;
+  transition: transform .2s;
+}
+.nav-links li a:hover, .nav-links li a.active {
+  color: var(--neon-blue);
+  background: rgba(0,212,255,0.06);
+}
+.nav-links li a:hover::after, .nav-links li a.active::after {
+  transform: translateX(-50%) scaleX(1);
+}
+.nav-right { margin-left:auto; display:flex; gap:10px; align-items:center; }
+.nav-badge {
+  padding:5px 14px; border-radius:20px; font-size:12px; font-weight:700;
+  border:1px solid var(--neon-purple);
+  color:var(--neon-purple);
+  cursor:pointer; transition:all .2s;
+  background: rgba(180,74,255,0.06);
+}
+.nav-badge:hover {
+  background:rgba(180,74,255,0.15);
+  box-shadow: 0 0 12px rgba(180,74,255,0.3);
+}
+.hamburger {
+  display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px;
+}
+.hamburger span {
+  display:block; width:22px; height:2px;
+  background: var(--neon-blue); border-radius:1px;
+  transition: all .3s;
+}
+
+/* ===== 页面切换 ===== */
+.page { display:none; }
+.page.active { display:block; }
+
+/* ============================================================
+   首页
+   ============================================================ */
+#page-home { padding-top:62px; }
+
+/* --- Hero Banner --- */
+.hero {
+  min-height: calc(100vh - 62px);
+  position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:60px 5vw 80px;
+  background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(0,212,255,0.06) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 80% at 80% 60%, rgba(180,74,255,0.08) 0%, transparent 60%),
+              linear-gradient(180deg, var(--bg0) 0%, var(--bg1) 100%);
+}
+
+/* 粒子网格 */
+.hero-grid {
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 0%, black 30%, transparent 100%);
+}
+
+/* 浮动光球 */
+.hero-orb {
+  position:absolute; border-radius:50%; pointer-events:none;
+  filter: blur(80px);
+}
+.hero-orb-1 { width:500px; height:500px; top:-150px; right:-100px;
+  background:radial-gradient(circle,rgba(180,74,255,0.18),transparent 70%);
+  animation: orbFloat1 12s ease-in-out infinite; }
+.hero-orb-2 { width:400px; height:400px; bottom:-100px; left:-80px;
+  background:radial-gradient(circle,rgba(0,212,255,0.14),transparent 70%);
+  animation: orbFloat2 15s ease-in-out infinite; }
+.hero-orb-3 { width:300px; height:300px; top:40%; left:45%;
+  background:radial-gradient(circle,rgba(255,45,120,0.1),transparent 70%);
+  animation: orbFloat3 10s ease-in-out infinite; }
+@keyframes orbFloat1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,40px)} }
+@keyframes orbFloat2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,-30px)} }
+@keyframes orbFloat3 { 0%,100%{transform:translate(0,0)} 33%{transform:translate(30px,-20px)} 66%{transform:translate(-20px,30px)} }
+
+/* 顶部装饰标签 */
+.hero-eyebrow {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 18px; border-radius:20px;
+  border:1px solid rgba(0,212,255,0.3);
+  background:rgba(0,212,255,0.06);
+  font-size:12px; letter-spacing:3px; color:var(--neon-blue);
+  margin-bottom:28px; position:relative; z-index:1;
+  animation: fadeUp .7s ease both;
+}
+.hero-eyebrow::before {
+  content:''; width:6px; height:6px; border-radius:50%;
+  background:var(--neon-blue);
+  box-shadow:0 0 8px var(--neon-blue);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+
+/* 主标题 */
+.hero-title {
+  font-size:clamp(38px,8vw,90px);
+  font-weight:900; line-height:1.05;
+  text-align:center;
+  position:relative; z-index:1;
+  animation: fadeUp .8s ease both;
+}
+.hero-title-top {
+  display:block;
+  background: linear-gradient(90deg,#ffffff 0%,var(--neon-blue) 40%,var(--neon-purple) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  filter: drop-shadow(0 0 30px rgba(0,212,255,0.3));
+}
+.hero-title-bottom {
+  display:block;
+  font-size:.45em; letter-spacing:10px;
+  color:var(--neon-purple);
+  text-shadow:0 0 20px var(--neon-purple), 0 0 40px rgba(180,74,255,.5);
+  margin-top:6px;
+}
+
+/* 副标题 */
+.hero-sub {
+  font-size:clamp(13px,1.6vw,16px);
+  color:var(--text2); line-height:1.9;
+  text-align:center; max-width:540px;
+  margin:24px 0 40px; position:relative; z-index:1;
+  animation: fadeUp .9s ease both;
+}
+
+/* 按钮组 */
+.hero-btns {
+  display:flex; gap:14px; flex-wrap:wrap; justify-content:center;
+  position:relative; z-index:1;
+  animation: fadeUp 1s ease both;
+}
+.btn-neon {
+  padding:13px 34px; border-radius:8px;
+  font-size:15px; font-weight:700; letter-spacing:1px;
+  cursor:pointer; border:none; transition:all .25s;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+  color:#fff;
+  box-shadow:0 0 20px rgba(0,212,255,0.3), 0 4px 20px rgba(0,0,0,.5);
+}
+.btn-neon:hover {
+  transform:translateY(-3px);
+  box-shadow:0 0 35px rgba(0,212,255,0.5), 0 8px 30px rgba(0,0,0,.5);
+}
+.btn-outline {
+  padding:13px 34px; border-radius:8px;
+  font-size:15px; font-weight:700; letter-spacing:1px;
+  cursor:pointer; transition:all .25s;
+  background:transparent;
+  border:1.5px solid var(--neon-purple);
+  color:var(--neon-purple);
+}
+.btn-outline:hover {
+  background:rgba(180,74,255,0.1);
+  box-shadow:0 0 20px rgba(180,74,255,0.3);
+  transform:translateY(-3px);
+}
+
+/* 滚动提示 */
+.scroll-hint {
+  position:absolute; bottom:28px; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  color:var(--text2); font-size:11px; letter-spacing:2px;
+  animation: bounceDown 2s ease infinite;
+  z-index:1;
+}
+.scroll-arrow {
+  width:18px; height:18px; border-right:2px solid var(--neon-blue);
+  border-bottom:2px solid var(--neon-blue);
+  transform:rotate(45deg);
+}
+@keyframes bounceDown { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
+
+/* --- 数据统计条 --- */
+.stats-bar {
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:24px 5vw;
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  background-image: linear-gradient(var(--border), var(--border));
+  background-size:1px 100%; background-repeat:no-repeat; background-position:center;
+}
+.stat-item {
+  text-align:center; padding:0 20px;
+  position:relative;
+}
+.stat-item:not(:last-child)::after {
+  content:''; position:absolute; right:0; top:20%; height:60%;
+  width:1px; background:var(--border);
+}
+.stat-num {
+  font-size:clamp(22px,3vw,34px); font-weight:900;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  display:block;
+}
+.stat-label { font-size:12px; color:var(--text2); margin-top:4px; letter-spacing:1px; }
+
+/* --- 热门攻略推荐 --- */
+.section {
+  padding:70px 5vw;
+  max-width:1280px; margin:0 auto;
+}
+.section-full { max-width:none; }
+.sec-head {
+  display:flex; align-items:flex-end; justify-content:space-between;
+  margin-bottom:40px; flex-wrap:wrap; gap:12px;
+}
+.sec-title-wrap {}
+.sec-tag {
+  font-size:11px; letter-spacing:3px; color:var(--neon-blue);
+  margin-bottom:8px; display:block;
+}
+.sec-title {
+  font-size:clamp(20px,3vw,30px); font-weight:900;
+  background:linear-gradient(90deg,#fff,var(--neon-blue));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.sec-title-accent { color:var(--neon-purple); -webkit-text-fill-color:var(--neon-purple); }
+.sec-more {
+  font-size:13px; color:var(--neon-blue);
+  display:flex; align-items:center; gap:6px;
+  cursor:pointer; transition:gap .2s;
+  border:1px solid rgba(0,212,255,0.25); padding:6px 16px; border-radius:20px;
+}
+.sec-more:hover { gap:10px; background:rgba(0,212,255,0.06); }
+
+/* 推荐卡网格 */
+.rec-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+.rec-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px; overflow:hidden;
+  cursor:pointer; transition:all .3s;
+  position:relative;
+}
+.rec-card::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(0,212,255,0.04),rgba(180,74,255,0.04));
+  opacity:0; transition:opacity .3s;
+  pointer-events:none;
+}
+.rec-card:hover {
+  border-color:rgba(0,212,255,0.4);
+  transform:translateY(-6px);
+  box-shadow:0 12px 40px rgba(0,0,0,.5), 0 0 20px rgba(0,212,255,0.1);
+}
+.rec-card:hover::before { opacity:1; }
+
+.rec-img {
+  height:170px; position:relative; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  font-size:72px;
+}
+.rec-tag {
+  position:absolute; top:10px; left:10px;
+  padding:3px 10px; border-radius:4px;
+  font-size:11px; font-weight:700;
+}
+.tag-boss { background:rgba(255,45,120,0.85); color:#fff; }
+.tag-item { background:rgba(0,212,255,0.8); color:#000; }
+.tag-hero { background:rgba(255,215,0,0.85); color:#000; }
+.tag-version { background:rgba(180,74,255,0.85); color:#fff; }
+.rec-hot { position:absolute; top:10px; right:10px; background:rgba(255,45,120,.9);
+  color:#fff; padding:3px 8px; border-radius:4px; font-size:10px; font-weight:700; }
+
+.rec-body { padding:16px 18px 20px; }
+.rec-title { font-size:15px; font-weight:700; color:var(--text); margin-bottom:8px; line-height:1.4; }
+.rec-desc { font-size:12px; color:var(--text2); line-height:1.7; margin-bottom:14px; }
+.rec-footer {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:12px; color:var(--text2);
+}
+.rec-views { display:flex; align-items:center; gap:4px; }
+.rec-btn {
+  padding:5px 14px; border-radius:5px; font-size:12px; font-weight:700;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));
+  color:#fff; cursor:pointer; border:none; transition:opacity .2s;
+}
+.rec-btn:hover { opacity:.85; }
+
+/* --- 英雄速查 --- */
+.hero-lookup {
+  background:linear-gradient(135deg,var(--bg2),var(--bg1));
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:60px 5vw;
+}
+.hero-lookup-inner { max-width:1280px; margin:0 auto; }
+.role-tabs {
+  display:flex; gap:8px; flex-wrap:wrap;
+  margin-bottom:30px;
+}
+.role-tab {
+  padding:7px 20px; border-radius:20px;
+  font-size:13px; font-weight:600;
+  cursor:pointer; transition:all .2s;
+  border:1.5px solid rgba(255,255,255,0.1);
+  color:var(--text2); background:none;
+}
+.role-tab.active, .role-tab:hover {
+  border-color:var(--neon-blue);
+  color:var(--neon-blue);
+  background:rgba(0,212,255,0.08);
+  box-shadow:0 0 12px rgba(0,212,255,0.15);
+}
+.heroes-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
+  gap:12px;
+}
+.hero-chip {
+  background:var(--card2); border:1px solid var(--border);
+  border-radius:10px; padding:12px 8px;
+  text-align:center; cursor:pointer; transition:all .2s;
+}
+.hero-chip:hover {
+  border-color:var(--neon-purple);
+  background:rgba(180,74,255,0.08);
+  transform:translateY(-3px);
+  box-shadow:0 4px 16px rgba(180,74,255,0.2);
+}
+.hc-avatar {
+  width:48px; height:48px; border-radius:12px;
+  margin:0 auto 8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px;
+}
+.hc-name { font-size:12px; color:var(--text); }
+.hc-role-label { font-size:10px; color:var(--text2); margin-top:2px; }
+
+/* ===== 英雄详情弹窗 ===== */
+.hero-modal-overlay {
+  position:fixed; inset:0; z-index:9999;
+  background:rgba(4,5,13,0.85);
+  backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+  transition:opacity .3s ease;
+}
+.hero-modal-overlay.open { opacity:1; pointer-events:auto; }
+
+.hero-modal {
+  width:92%; max-width:680px; max-height:88vh;
+  background:linear-gradient(170deg, var(--bg2) 0%, var(--bg0) 100%);
+  border:1px solid var(--border2);
+  border-radius:16px;
+  overflow-y:auto; overflow-x:hidden;
+  box-shadow:0 0 60px rgba(180,74,255,0.15), 0 0 120px rgba(0,212,255,0.08);
+  transform:translateY(30px) scale(0.95);
+  transition:transform .35s cubic-bezier(.22,1,.36,1);
+  scrollbar-width:thin;
+  scrollbar-color:rgba(180,74,255,0.3) transparent;
+}
+.hero-modal-overlay.open .hero-modal {
+  transform:translateY(0) scale(1);
+}
+.hero-modal::-webkit-scrollbar { width:5px; }
+.hero-modal::-webkit-scrollbar-track { background:transparent; }
+.hero-modal::-webkit-scrollbar-thumb { background:rgba(180,74,255,0.3); border-radius:3px; }
+
+.hm-header {
+  position:sticky; top:0; z-index:2;
+  background:linear-gradient(180deg, var(--bg1) 70%, transparent);
+  padding:24px 24px 30px;
+  display:flex; gap:20px; align-items:center;
+}
+.hm-close {
+  position:absolute; top:14px; right:14px;
+  width:32px; height:32px; border-radius:8px;
+  border:1px solid var(--border); background:var(--card2);
+  color:var(--text2); font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s;
+}
+.hm-close:hover { border-color:var(--neon-purple); color:var(--neon-purple); background:rgba(180,74,255,0.1); }
+
+.hm-avatar {
+  width:72px; height:72px; border-radius:16px;
+  background:linear-gradient(135deg,rgba(255,45,120,.25),rgba(255,45,120,.08));
+  display:flex; align-items:center; justify-content:center;
+  font-size:40px; flex-shrink:0;
+  border:2px solid rgba(255,45,120,0.3);
+  box-shadow:0 0 20px rgba(255,45,120,0.15);
+}
+.hm-info { flex:1; }
+.hm-title {
+  font-size:22px; font-weight:700;
+  background:linear-gradient(90deg,var(--neon-pink),var(--neon-purple));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  text-shadow:none;
+}
+.hm-subtitle { font-size:13px; color:var(--text2); margin-top:4px; }
+.hm-tags { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.hm-tag {
+  font-size:11px; padding:3px 10px; border-radius:20px;
+  border:1px solid var(--border); color:var(--text2);
+  background:rgba(0,0,0,0.3);
+}
+.hm-tag.tier { border-color:rgba(255,215,0,0.4); color:var(--gold); }
+.hm-tag.role { border-color:rgba(255,45,120,0.4); color:var(--neon-pink); }
+.hm-tag.diff { border-color:rgba(0,212,255,0.3); color:var(--neon-blue); }
+
+.hm-body { padding:0 24px 28px; }
+
+.hm-section {
+  margin-top:22px;
+}
+.hm-section-title {
+  font-size:14px; font-weight:700; color:var(--neon-purple);
+  padding-bottom:8px; margin-bottom:14px;
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:8px;
+}
+.hm-section-title::before {
+  content:''; width:3px; height:14px; border-radius:2px;
+  background:linear-gradient(180deg,var(--neon-purple),var(--neon-pink));
+}
+
+/* 技能卡片 */
+.hm-skill {
+  background:var(--card2); border:1px solid var(--border);
+  border-radius:10px; padding:12px 14px; margin-bottom:10px;
+  transition:border-color .2s;
+}
+.hm-skill:hover { border-color:var(--neon-purple); }
+.hm-skill-name {
+  font-size:13px; font-weight:600; color:var(--neon-blue);
+  margin-bottom:4px;
+}
+.hm-skill-desc { font-size:12px; color:var(--text2); line-height:1.7; }
+
+/* 出装列表 */
+.hm-builds {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:8px;
+}
+.hm-build-item {
+  display:flex; align-items:center; gap:10px;
+  background:var(--card2); border:1px solid var(--border);
+  border-radius:8px; padding:8px 12px;
+  transition:border-color .2s;
+}
+.hm-build-item:hover { border-color:var(--gold); }
+.hm-build-num {
+  width:20px; height:20px; border-radius:50%;
+  background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));
+  font-size:10px; font-weight:700; color:#fff;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.hm-build-text { flex:1; }
+.hm-build-name { font-size:12px; font-weight:600; color:var(--text); }
+.hm-build-desc { font-size:10px; color:var(--text2); margin-top:1px; }
+
+/* 铭文 */
+.hm-rune-box {
+  background:var(--card2); border:1px solid rgba(255,215,0,0.15);
+  border-radius:10px; padding:12px 16px;
+  font-size:13px; color:var(--gold); line-height:1.8;
+}
+.hm-rune-box span { color:var(--text2); font-size:12px; }
+
+/* 连招 */
+.hm-combos { display:flex; flex-direction:column; gap:8px; }
+.hm-combo {
+  background:var(--card2); border:1px solid var(--border);
+  border-radius:8px; padding:10px 14px;
+  display:flex; align-items:center; gap:10px;
+  transition:border-color .2s;
+}
+.hm-combo:hover { border-color:var(--neon-blue); }
+.hm-combo-num {
+  width:24px; height:24px; border-radius:6px;
+  background:linear-gradient(135deg,var(--neon-blue),var(--neon-purple));
+  font-size:11px; font-weight:700; color:#fff;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.hm-combo-text { font-size:12px; color:var(--text); font-family:'Consolas','Courier New',monospace; letter-spacing:0.5px; }
+
+/* 贴士 */
+.hm-tips { display:flex; flex-direction:column; gap:8px; }
+.hm-tip {
+  background:var(--card2); border:1px solid var(--border);
+  border-radius:8px; padding:10px 14px;
+  font-size:12px; color:var(--text2); line-height:1.7;
+  display:flex; gap:10px; align-items:flex-start;
+  transition:border-color .2s;
+}
+.hm-tip:hover { border-color:rgba(0,212,255,0.3); }
+.hm-tip-icon { flex-shrink:0; font-size:14px; margin-top:1px; }
+
+@media(max-width:500px) {
+  .hm-header { flex-direction:column; text-align:center; padding:20px 16px 24px; }
+  .hm-tags { justify-content:center; }
+  .hm-body { padding:0 16px 24px; }
+  .hm-builds { grid-template-columns:1fr; }
+  .hero-modal { max-height:92vh; }
+}
+
+/* ============================================================
+   BOSS攻略
+   ============================================================ */
+#page-boss { padding-top:62px; }
+
+.boss-hero {
+  min-height:340px;
+  display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+  background:radial-gradient(ellipse 100% 100% at 50% 50%,rgba(255,45,120,0.1) 0%,transparent 60%),
+             linear-gradient(180deg,var(--bg0),var(--bg1));
+  padding:60px 5vw 50px;
+  text-align:center;
+}
+.boss-hero::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(rgba(255,45,120,0.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,45,120,0.05) 1px,transparent 1px);
+  background-size:40px 40px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent);
+}
+.boss-hero-title {
+  font-size:clamp(28px,6vw,56px); font-weight:900;
+  background:linear-gradient(90deg,#fff,var(--neon-pink),var(--neon-purple));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(255,45,120,0.4));
+  position:relative; z-index:1;
+}
+.boss-hero-sub { font-size:14px; color:var(--text2); margin-top:12px; position:relative; z-index:1; }
+
+/* BOSS卡片 */
+.boss-section { padding:50px 5vw 80px; max-width:1280px; margin:0 auto; }
+.boss-cards { display:flex; flex-direction:column; gap:36px; }
+
+.boss-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px; overflow:hidden;
+  transition:all .3s;
+  position:relative;
+}
+.boss-card::before {
+  content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
+}
+.boss-card.boss-tyrant::before { background:linear-gradient(180deg,var(--neon-pink),rgba(255,45,120,0)); }
+.boss-card.boss-dominator::before { background:linear-gradient(180deg,var(--gold),rgba(255,215,0,0)); }
+.boss-card.boss-dragon::before { background:linear-gradient(180deg,var(--neon-blue),rgba(0,212,255,0)); }
+.boss-card:hover {
+  transform:translateY(-4px);
+  box-shadow:0 16px 50px rgba(0,0,0,.6);
+}
+.boss-card.boss-tyrant:hover { border-color:rgba(255,45,120,0.35); box-shadow:0 16px 50px rgba(0,0,0,.6),0 0 20px rgba(255,45,120,0.1); }
+.boss-card.boss-dominator:hover { border-color:rgba(255,215,0,0.35); box-shadow:0 16px 50px rgba(0,0,0,.6),0 0 20px rgba(255,215,0,0.1); }
+.boss-card.boss-dragon:hover { border-color:rgba(0,212,255,0.35); box-shadow:0 16px 50px rgba(0,0,0,.6),0 0 20px rgba(0,212,255,0.1); }
+
+.boss-layout { display:grid; grid-template-columns:280px 1fr; }
+.boss-portrait {
+  min-height:280px; display:flex; align-items:center; justify-content:center;
+  font-size:110px; position:relative; overflow:hidden;
+}
+.boss-portrait-glow {
+  position:absolute; width:200px; height:200px; border-radius:50%;
+  pointer-events:none;
+}
+.boss-tyrant .boss-portrait { background:linear-gradient(135deg,#1a0610,#3d0820); }
+.boss-tyrant .boss-portrait-glow { background:radial-gradient(circle,rgba(255,45,120,0.25),transparent 70%); }
+.boss-dominator .boss-portrait { background:linear-gradient(135deg,#1a1100,#3d2a00); }
+.boss-dominator .boss-portrait-glow { background:radial-gradient(circle,rgba(255,215,0,0.25),transparent 70%); }
+.boss-dragon .boss-portrait { background:linear-gradient(135deg,#001a20,#003040); }
+.boss-dragon .boss-portrait-glow { background:radial-gradient(circle,rgba(0,212,255,0.25),transparent 70%); }
+
+.boss-emoji { position:relative; z-index:1; animation: bossFloat 4s ease-in-out infinite; }
+@keyframes bossFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-10px) scale(1.03)} }
+
+.boss-content { padding:28px 32px 28px; }
+.boss-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; gap:12px; flex-wrap:wrap; }
+.boss-name-wrap {}
+.boss-level { font-size:11px; letter-spacing:2px; margin-bottom:6px; display:block; }
+.boss-tyrant .boss-level { color:var(--neon-pink); }
+.boss-dominator .boss-level { color:var(--gold); }
+.boss-dragon .boss-level { color:var(--neon-blue); }
+.boss-name { font-size:clamp(20px,3vw,28px); font-weight:900; color:var(--text); }
+.boss-badges { display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start; }
+.boss-badge {
+  padding:4px 12px; border-radius:4px; font-size:11px; font-weight:700;
+}
+.badge-spawn { background:rgba(180,74,255,0.15); border:1px solid rgba(180,74,255,0.3); color:var(--neon-purple); }
+.badge-hard { background:rgba(255,45,120,0.12); border:1px solid rgba(255,45,120,0.3); color:var(--neon-pink); }
+.badge-time { background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.25); color:var(--neon-blue); }
+
+/* BOSS属性条 */
+.boss-attrs { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px; }
+.boss-attr { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:10px 14px; }
+.boss-attr-val { font-size:18px; font-weight:900; display:block; }
+.boss-tyrant .boss-attr-val { color:var(--neon-pink); }
+.boss-dominator .boss-attr-val { color:var(--gold); }
+.boss-dragon .boss-attr-val { color:var(--neon-blue); }
+.boss-attr-key { font-size:11px; color:var(--text2); display:block; margin-top:3px; }
+
+/* 战略区 */
+.boss-strategy { margin-bottom:20px; }
+.boss-strategy-title { font-size:13px; font-weight:700; color:var(--text2); margin-bottom:12px; letter-spacing:1px; }
+.boss-tips { display:flex; flex-direction:column; gap:8px; }
+.boss-tip {
+  display:flex; align-items:flex-start; gap:10px;
+  background:rgba(255,255,255,0.02); border-radius:8px; padding:10px 14px;
+  font-size:13px; color:var(--text2); line-height:1.6;
+  border-left:2px solid;
+}
+.boss-tyrant .boss-tip { border-color:rgba(255,45,120,0.4); }
+.boss-dominator .boss-tip { border-color:rgba(255,215,0,0.4); }
+.boss-dragon .boss-tip { border-color:rgba(0,212,255,0.4); }
+.boss-tip-num {
+  flex-shrink:0; width:20px; height:20px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; color:#fff;
+}
+.boss-tyrant .boss-tip-num { background:var(--neon-pink); }
+.boss-dominator .boss-tip-num { background:var(--gold); color:#000; }
+.boss-dragon .boss-tip-num { background:var(--neon-blue); color:#000; }
+
+/* 奖励区 */
+.boss-rewards { display:flex; gap:8px; flex-wrap:wrap; }
+.reward-chip {
+  padding:5px 12px; border-radius:6px; font-size:12px; font-weight:600;
+  display:flex; align-items:center; gap:5px;
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+  color:var(--text2);
+}
+
+/* ============================================================
+   隐藏道具
+   ============================================================ */
+#page-items { padding-top:62px; }
+
+.items-hero {
+  min-height:300px;
+  display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+  background:radial-gradient(ellipse 100% 100% at 50% 50%,rgba(0,212,255,0.08) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 60% at 80% 30%,rgba(180,74,255,0.08) 0%,transparent 60%),
+             linear-gradient(180deg,var(--bg0),var(--bg1));
+  padding:60px 5vw 50px;
+  text-align:center;
+}
+.items-hero::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(rgba(0,212,255,0.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(180,74,255,0.04) 1px,transparent 1px);
+  background-size:50px 50px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent);
+}
+.items-hero-title {
+  font-size:clamp(28px,5vw,52px); font-weight:900;
+  background:linear-gradient(90deg,#fff,var(--neon-blue),var(--neon-purple));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  filter:drop-shadow(0 0 25px rgba(0,212,255,0.3));
+  position:relative; z-index:1;
+}
+.items-hero-sub { font-size:14px; color:var(--text2); margin-top:12px; position:relative; z-index:1; }
+
+/* 筛选 */
+.items-filter-bar {
+  padding:28px 5vw;
+  background:var(--bg1);
+  border-bottom:1px solid var(--border);
+  display:flex; gap:8px; flex-wrap:wrap;
+  justify-content:center;
+}
+.ifilter-btn {
+  padding:7px 20px; border-radius:20px;
+  font-size:13px; font-weight:600; cursor:pointer;
+  border:1.5px solid rgba(255,255,255,0.1);
+  color:var(--text2); background:none; transition:all .2s;
+}
+.ifilter-btn.active, .ifilter-btn:hover {
+  border-color:var(--neon-purple);
+  color:var(--neon-purple);
+  background:rgba(180,74,255,0.08);
+  box-shadow:0 0 12px rgba(180,74,255,0.15);
+}
+
+/* 道具卡片区 */
+.items-section { padding:50px 5vw 80px; max-width:1280px; margin:0 auto; }
+.sub-section { margin-bottom:56px; }
+.sub-sec-title {
+  font-size:16px; font-weight:800; color:var(--text);
+  margin-bottom:8px; display:flex; align-items:center; gap:10px;
+}
+.sub-sec-title::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(90deg,var(--border),transparent);
+}
+.sub-sec-desc { font-size:13px; color:var(--text2); margin-bottom:24px; }
+
+.items-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:18px;
+}
+.item-card {
+  background:var(--card);
+  border-radius:14px; overflow:hidden;
+  cursor:pointer; transition:all .3s;
+  position:relative;
+  border:1px solid var(--border);
+}
+.item-card::after {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+}
+.item-card.rarity-legendary::after { background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+.item-card.rarity-epic::after { background:linear-gradient(90deg,transparent,var(--neon-purple),transparent); }
+.item-card.rarity-rare::after { background:linear-gradient(90deg,transparent,var(--neon-blue),transparent); }
+.item-card.rarity-secret::after { background:linear-gradient(90deg,transparent,var(--neon-pink),transparent); }
+
+.item-card:hover {
+  transform:translateY(-6px);
+  box-shadow:0 14px 40px rgba(0,0,0,.5);
+}
+.item-card.rarity-legendary:hover { border-color:rgba(255,215,0,0.4); }
+.item-card.rarity-epic:hover { border-color:rgba(180,74,255,0.4); }
+.item-card.rarity-rare:hover { border-color:rgba(0,212,255,0.4); }
+.item-card.rarity-secret:hover { border-color:rgba(255,45,120,0.4); }
+
+.item-top {
+  height:110px; display:flex; align-items:center; justify-content:center;
+  position:relative; font-size:52px;
+}
+.item-card.rarity-legendary .item-top { background:linear-gradient(135deg,#1a1200,#2e2000); }
+.item-card.rarity-epic .item-top { background:linear-gradient(135deg,#110a1e,#1e1035); }
+.item-card.rarity-rare .item-top { background:linear-gradient(135deg,#001420,#001e30); }
+.item-card.rarity-secret .item-top { background:linear-gradient(135deg,#1a0008,#2e0015); }
+
+.item-rarity-badge {
+  position:absolute; top:8px; right:8px;
+  padding:2px 9px; border-radius:4px; font-size:10px; font-weight:700;
+}
+.rarity-legendary .item-rarity-badge { background:rgba(255,215,0,0.85); color:#000; }
+.rarity-epic .item-rarity-badge { background:rgba(180,74,255,0.85); color:#fff; }
+.rarity-rare .item-rarity-badge { background:rgba(0,212,255,0.8); color:#000; }
+.rarity-secret .item-rarity-badge { background:rgba(255,45,120,0.85); color:#fff; }
+
+.item-lock {
+  position:absolute; bottom:8px; left:8px;
+  background:rgba(255,45,120,0.15); border:1px solid rgba(255,45,120,0.3);
+  padding:2px 8px; border-radius:4px; font-size:10px; color:var(--neon-pink);
+}
+
+.item-body { padding:14px 16px 18px; }
+.item-name { font-size:15px; font-weight:700; color:var(--text); margin-bottom:5px; }
+.item-type { font-size:11px; color:var(--text2); margin-bottom:10px; }
+.item-desc { font-size:12px; color:var(--text2); line-height:1.7; margin-bottom:12px; }
+.item-desc strong { color:var(--neon-blue); }
+.item-card.rarity-legendary .item-desc strong { color:var(--gold); }
+.item-card.rarity-epic .item-desc strong { color:var(--neon-purple); }
+.item-card.rarity-secret .item-desc strong { color:var(--neon-pink); }
+
+.item-location {
+  background:rgba(255,255,255,0.03); border-radius:6px; padding:8px 10px;
+  display:flex; gap:6px; align-items:flex-start;
+  font-size:11px; color:var(--text2);
+}
+.item-loc-label { flex-shrink:0; font-weight:700; }
+.rarity-legendary .item-loc-label { color:var(--gold); }
+.rarity-epic .item-loc-label { color:var(--neon-purple); }
+.rarity-rare .item-loc-label { color:var(--neon-blue); }
+.rarity-secret .item-loc-label { color:var(--neon-pink); }
+
+/* ===== 地图概览 ===== */
+.map-overview {
+  margin:0 5vw 60px; max-width:1280px;
+  background:var(--card2); border:1px solid var(--border2);
+  border-radius:18px; overflow:hidden;
+}
+.map-header {
+  padding:20px 28px;
+  background:linear-gradient(90deg,rgba(180,74,255,0.1),rgba(0,212,255,0.06));
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:12px;
+}
+.map-header-title { font-size:16px; font-weight:800; color:var(--text); }
+.map-header-sub { font-size:12px; color:var(--text2); margin-top:2px; }
+.map-body { padding:24px 28px; }
+.map-regions {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:14px;
+}
+.map-region {
+  background:rgba(255,255,255,0.03); border:1px solid var(--border);
+  border-radius:10px; padding:14px 16px;
+  cursor:pointer; transition:all .2s;
+}
+.map-region:hover {
+  background:rgba(180,74,255,0.06); border-color:var(--neon-purple);
+}
+.mr-name { font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+.mr-count { font-size:11px; color:var(--neon-purple); background:rgba(180,74,255,0.1); padding:1px 8px; border-radius:10px; }
+.mr-items { display:flex; flex-direction:column; gap:4px; }
+.mr-item-line { font-size:12px; color:var(--text2); display:flex; align-items:center; gap:6px; }
+.mr-item-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+
+/* ===== 通用动画 ===== */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(24px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.fade-in { opacity:0; transform:translateY(20px); transition:opacity .5s ease,transform .5s ease; }
+.fade-in.visible { opacity:1; transform:translateY(0); }
+
+/* ===== Toast ===== */
+#toast {
+  position:fixed; bottom:30px; right:30px; z-index:9000;
+  background:linear-gradient(135deg,var(--bg3),var(--card));
+  border:1px solid var(--neon-blue);
+  border-radius:10px; padding:12px 22px;
+  font-size:14px; color:var(--text);
+  box-shadow:0 4px 24px rgba(0,0,0,.5),0 0 16px rgba(0,212,255,0.2);
+  opacity:0; transform:translateY(16px);
+  transition:all .3s;
+  pointer-events:none;
+}
+#toast.show { opacity:1; transform:translateY(0); }
+
+/* ===== 响应式 ===== */
+@media (max-width:960px) {
+  .rec-grid { grid-template-columns:1fr 1fr; }
+  .boss-layout { grid-template-columns:1fr; }
+  .boss-portrait { min-height:200px; }
+  .boss-attrs { grid-template-columns:repeat(3,1fr); }
+}
+@media (max-width:700px) {
+  .stats-bar { grid-template-columns:1fr 1fr; }
+  .stat-item:not(:last-child)::after { display:none; }
+  .rec-grid { grid-template-columns:1fr; }
+  .nav-links { display:none; position:fixed; top:62px; left:0; right:0; bottom:0;
+    flex-direction:column; background:rgba(4,5,13,0.97); padding:30px 20px;
+    align-items:flex-start; z-index:999; overflow-y:auto; }
+  .nav-links.open { display:flex; }
+  .nav-links li a { font-size:18px; padding:12px 0; }
+  .hamburger { display:flex; }
+  .nav-badge { display:none; }
+  .boss-attrs { grid-template-columns:1fr 1fr; }
+  .heroes-grid { grid-template-columns:repeat(auto-fill,minmax(75px,1fr)); }
+}
+@media (max-width:480px) {
+  .stats-bar { grid-template-columns:1fr; }
+  .hero-btns { flex-direction:column; align-items:center; }
+  .btn-neon,.btn-outline { width:100%; max-width:260px; text-align:center; justify-content:center; }
+}
+
+/* ===== 攻略视频指路 ===== */
+.video-section {
+  padding:70px 5vw;
+  background:linear-gradient(180deg,var(--bg1),var(--bg0));
+  border-top:1px solid var(--border);
+}
+.video-section-inner { max-width:1280px; margin:0 auto; }
+.video-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+.vid-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px; overflow:hidden;
+  transition:all .3s; position:relative;
+}
+.vid-card:hover {
+  border-color:rgba(0,212,255,0.4);
+  transform:translateY(-5px);
+  box-shadow:0 12px 40px rgba(0,0,0,.5),0 0 20px rgba(0,212,255,0.1);
+}
+.vid-cover {
+  height:160px; position:relative;
+  display:flex; align-items:center; justify-content:center;
+  font-size:56px; overflow:hidden;
+}
+.vid-cover::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg,transparent 50%,var(--card) 100%);
+}
+.vid-play-icon {
+  position:absolute; z-index:2;
+  width:48px; height:48px; border-radius:50%;
+  background:rgba(0,0,0,0.6); border:2px solid rgba(255,255,255,0.8);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; transition:opacity .3s;
+  pointer-events:none;
+}
+.vid-play-icon::after {
+  content:''; display:block;
+  width:0; height:0;
+  border-top:8px solid transparent;
+  border-bottom:8px solid transparent;
+  border-left:14px solid #fff;
+  margin-left:3px;
+}
+.vid-card:hover .vid-play-icon { opacity:1; }
+.vid-source-badge {
+  position:absolute; top:10px; right:10px; z-index:2;
+  padding:3px 10px; border-radius:4px;
+  font-size:11px; font-weight:700;
+}
+.badge-bilibili { background:rgba(251,114,153,0.9); color:#fff; }
+.badge-douyin { background:rgba(0,0,0,0.7); color:#fff; border:1px solid rgba(255,255,255,0.3); }
+.badge-official { background:rgba(0,180,80,0.85); color:#fff; }
+.badge-taptap { background:rgba(0,212,255,0.85); color:#000; }
+.vid-body { padding:14px 18px 18px; }
+.vid-title { font-size:14px; font-weight:700; color:var(--text); line-height:1.5; margin-bottom:8px; }
+.vid-meta {
+  display:flex; align-items:center; gap:8px;
+  font-size:11px; color:var(--text2);
+  margin-bottom:12px;
+}
+.vid-meta-tag {
+  padding:2px 8px; border-radius:3px;
+  background:rgba(0,212,255,0.1); color:var(--neon-blue);
+  border:1px solid rgba(0,212,255,0.2);
+}
+.vid-go {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:7px 18px; border-radius:6px;
+  font-size:12px; font-weight:700;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));
+  color:#fff; cursor:pointer; border:none;
+  text-decoration:none; transition:all .2s;
+}
+.vid-go:hover { opacity:.85; transform:translateX(3px); }
+.vid-go-arrow { transition:transform .2s; }
+.vid-go:hover .vid-go-arrow { transform:translateX(3px); }
+.vid-notice {
+  margin-top:24px; padding:14px 20px;
+  background:rgba(0,212,255,0.04);
+  border:1px solid rgba(0,212,255,0.12);
+  border-radius:10px;
+  font-size:12px; color:var(--text2); line-height:1.8;
+}
+.vid-notice strong { color:var(--neon-blue); }
+
+@media (max-width:960px) {
+  .video-grid { grid-template-columns:1fr 1fr; }
+}
+@media (max-width:700px) {
+  .video-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ========== 导航栏 ========== -->
+<nav id="navbar">
+  <div class="nav-logo" onclick="showPage('home')">
+    <div class="nav-logo-hex">
+      <svg viewBox="0 0 36 36"><polygon points="18,2 34,10 34,26 18,34 2,26 2,10" fill="none" stroke="url(#lg)" stroke-width="1.5"/>
+        <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#b44aff"/></linearGradient></defs>
+        <text x="18" y="23" text-anchor="middle" font-size="13" font-weight="900" fill="url(#lg)">王</text>
+      </svg>
+    </div>
+    <span class="nav-logo-text">峡谷攻略</span>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="javascript:void(0)" class="active" data-page="home" onclick="navClick(event,'home')">首页</a></li>
+    <li><a href="javascript:void(0)" data-page="boss" onclick="navClick(event,'boss')">BOSS攻略</a></li>
+    <li><a href="javascript:void(0)" data-page="items" onclick="navClick(event,'items')">隐藏道具</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-badge" onclick="showTierList()">S43 陌上相逢</div>
+  </div>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ========== 首页 ========== -->
+<div class="page active" id="page-home">
+  <!-- Hero Banner -->
+  <div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-orb hero-orb-3"></div>
+
+    <div class="hero-eyebrow">S43赛季 · 陌上相逢 · 最新攻略</div>
+    <h1 class="hero-title">
+      <span class="hero-title-top">称霸王者峡谷</span>
+      <span class="hero-title-bottom">KING GLORY GUIDE</span>
+    </h1>
+    <p class="hero-sub">S43「陌上相逢」赛季攻略 · 14位英雄调整 · 新英雄元流之子刺客登场 · 新装备幽影袖箭上线<br>新召唤师技能「汇流成兵」· 王者农场玩法 · 每日更新制胜先机</p>
+    <div class="hero-btns">
+      <button class="btn-neon" onclick="showPage('boss')">⚔ 查看BOSS攻略</button>
+      <button class="btn-outline" onclick="showPage('items')">💎 隐藏道具大全</button>
+    </div>
+    <div class="scroll-hint">
+      <span>向下探索</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </div>
+
+  <!-- 统计条 -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-num" id="cnt1">0</span>
+      <span class="stat-label">攻略文章</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" id="cnt2">0</span>
+      <span class="stat-label">英雄覆盖</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" id="cnt3">0</span>
+      <span class="stat-label">隐藏道具</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" id="cnt4">0</span>
+      <span class="stat-label">每日访问</span>
+    </div>
+  </div>
+
+  <!-- 热门攻略推荐 -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-title-wrap">
+        <span class="sec-tag">HOT PICKS</span>
+        <h2 class="sec-title">热门攻略 <span class="sec-title-accent">推荐</span></h2>
+      </div>
+      <div class="sec-more">全部攻略 →</div>
+    </div>
+    <div class="rec-grid">
+      <!-- 卡片1: 版本全解读 -->
+      <div class="rec-card fade-in">
+        <div class="rec-img" style="background:linear-gradient(135deg,#1a0610,#3d0820)">🐉
+          <span class="rec-tag tag-boss">BOSS</span>
+          <span class="rec-hot">🔥 HOT</span>
+        </div>
+        <div class="rec-body">
+          <div class="rec-title">S43赛季版本全解读 · 陌上相逢14位英雄调整</div>
+          <div class="rec-desc">亚瑟一技能新增空放位移、程咬金大招击飞、元法重做加强，赵云云缨削弱，新赛季格局全解析</div>
+          <div class="rec-footer">
+            <span class="rec-views">👁 28.6万</span>
+            <button class="rec-btn" onclick="showPage('boss')">查看详情</button>
+          </div>
+        </div>
+      </div>
+      <!-- 卡片2: 新英雄元流之子 -->
+      <div class="rec-card fade-in">
+        <div class="rec-img" style="background:linear-gradient(135deg,#001420,#003040)">🗡️
+          <span class="rec-tag tag-hero">英雄</span>
+          <span class="rec-hot">🆕 NEW</span>
+        </div>
+        <div class="rec-body">
+          <div class="rec-title">新英雄元流之子·刺客 深度攻略 · 免费获取</div>
+          <div class="rec-desc">元流家族第五职业登场！双爪武器、高机动性、多段位移穿梭，被动残血收割机制全解析</div>
+          <div class="rec-footer">
+            <span class="rec-views">👁 22.1万</span>
+            <button class="rec-btn" onclick="openHeroModal(heroData.findIndex(h=>h.name==='元流之子·刺客'))">查看详情</button>
+          </div>
+        </div>
+      </div>
+      <!-- 卡片3: 新装备幽影袖箭 -->
+      <div class="rec-card fade-in">
+        <div class="rec-img" style="background:linear-gradient(135deg,#0a0020,#200050)">💎
+          <span class="rec-tag tag-item">装备</span>
+          <span class="rec-hot">🆕 NEW</span>
+        </div>
+        <div class="rec-body">
+          <div class="rec-title">新装备「幽影袖箭」全解析 · 射手保命神器</div>
+          <div class="rec-desc">2.5秒隐身+回血+无法锁定！名刀·司命重做可升级至1.75秒无敌，回响之杖加强回归</div>
+          <div class="rec-footer">
+            <span class="rec-views">👁 19.4万</span>
+            <button class="rec-btn" onclick="showPage('items')">查看详情</button>
+          </div>
+        </div>
+      </div>
+      <!-- 卡片4: 亚瑟S43加强 -->
+      <div class="rec-card fade-in">
+        <div class="rec-img" style="background:linear-gradient(135deg,#1a1100,#3d2a00)">⚔️
+          <span class="rec-tag tag-hero">英雄</span>
+        </div>
+        <div class="rec-body">
+          <div class="rec-title">亚瑟 S43加强攻略 · 穿墙位移新版打法</div>
+          <div class="rec-desc">一技能强化普攻新增空放位移可穿墙，机动性质变！对抗路T0级上分利器完整教学</div>
+          <div class="rec-footer">
+            <span class="rec-views">👁 17.8万</span>
+            <button class="rec-btn" onclick="openHeroModal(heroData.findIndex(h=>h.name==='亚瑟'))">查看详情</button>
+          </div>
+        </div>
+      </div>
+      <!-- 卡片5: T0英雄排行 -->
+      <div class="rec-card fade-in">
+        <div class="rec-img" style="background:linear-gradient(135deg,#100020,#2a0050)">🏆
+          <span class="rec-tag tag-version">版本</span>
+        </div>
+        <div class="rec-body">
+          <div class="rec-title">S43赛季T0英雄排行 · 五路版本之子推荐</div>
+          <div class="rec-desc">亚瑟(对抗)、云缨(打野)、元法(中路)、大禹(游走)、孙权(发育路)，大数据胜率验证</div>
+          <div class="rec-footer">
+            <span class="rec-views">👁 31万</span>
+            <button class="rec-btn" onclick="showTierList()">查看详情</button>
+          </div>
+        </div>
+      </div>
+      <!-- 卡片6: 王者农场 -->
+      <div class="rec-card fade-in">
+        <div class="rec-img" style="background:linear-gradient(135deg,#001a08,#003d18)">🌾
+          <span class="rec-tag tag-version">玩法</span>
+        </div>
+        <div class="rec-body">
+          <div class="rec-title">王者农场 & 小屋系统 · S43休闲玩法指南</div>
+          <div class="rec-desc">种菜偷菜回归！小屋装扮自由搭配，组队房间展示个性，新赛季休闲玩法完全攻略</div>
+          <div class="rec-footer">
+            <span class="rec-views">👁 13.5万</span>
+            <button class="rec-btn" onclick="showFarmGuide()">查看详情</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 英雄速查 -->
+  <div class="hero-lookup">
+    <div class="hero-lookup-inner">
+      <div class="sec-head">
+        <div class="sec-title-wrap">
+          <span class="sec-tag">HERO DATABASE</span>
+          <h2 class="sec-title">英雄 <span class="sec-title-accent">速查</span></h2>
+        </div>
+      </div>
+      <div class="role-tabs" id="roleTabs">
+        <button class="role-tab active" data-role="all">全部</button>
+        <button class="role-tab" data-role="warrior">⚔ 战士</button>
+        <button class="role-tab" data-role="mage">🔮 法师</button>
+        <button class="role-tab" data-role="archer">🏹 射手</button>
+        <button class="role-tab" data-role="assassin">🗡 刺客</button>
+        <button class="role-tab" data-role="support">🛡 辅助</button>
+        <button class="role-tab" data-role="tank">🪨 坦克</button>
+      </div>
+      <div class="heroes-grid" id="heroesGrid"></div>
+    </div>
+  </div>
+
+  <!-- 攻略视频指路 -->
+  <div class="video-section">
+    <div class="video-section-inner">
+      <div class="sec-head">
+        <div class="sec-title-wrap">
+          <span class="sec-tag">VIDEO GUIDE</span>
+          <h2 class="sec-title">攻略视频 <span class="sec-title-accent">指路</span></h2>
+        </div>
+      </div>
+
+      <div class="video-grid">
+
+        <!-- 1. B站: S43打野梯度排行 -->
+        <div class="vid-card fade-in">
+          <div class="vid-cover" style="background:linear-gradient(135deg,#1a0520,#3d1040)">
+            🗡️
+            <span class="vid-source-badge badge-bilibili">B站</span>
+            <div class="vid-play-icon"></div>
+          </div>
+          <div class="vid-body">
+            <div class="vid-title">S43赛季打野梯度排行 · 镜神云缨排位分析</div>
+            <div class="vid-meta">
+              <span class="vid-meta-tag">打野</span>
+              <span class="vid-meta-tag">S43</span>
+              <span>出品：B站UP主</span>
+            </div>
+            <a class="vid-go" href="https://www.bilibili.com/video/BV1A7Lx6QEVu/" target="_blank" rel="noopener noreferrer nofollow">
+              前往B站观看 <span class="vid-go-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 2. B站: 元流之子刺客+S43版本核心 -->
+        <div class="vid-card fade-in">
+          <div class="vid-cover" style="background:linear-gradient(135deg,#001030,#002060)">
+            ⚡
+            <span class="vid-source-badge badge-bilibili">B站</span>
+            <div class="vid-play-icon"></div>
+          </div>
+          <div class="vid-body">
+            <div class="vid-title">元流之子刺客八大盲区技巧 + 汇流成兵版本核心</div>
+            <div class="vid-meta">
+              <span class="vid-meta-tag">新英雄</span>
+              <span class="vid-meta-tag">刺客</span>
+              <span>出品：B站UP主</span>
+            </div>
+            <a class="vid-go" href="https://www.bilibili.com/video/BV1ToLz6aE3Y/" target="_blank" rel="noopener noreferrer nofollow">
+              前往B站观看 <span class="vid-go-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 3. 抖音: 亚瑟S43操作设置教学 -->
+        <div class="vid-card fade-in">
+          <div class="vid-cover" style="background:linear-gradient(135deg,#1a1000,#3d2a00)">
+            ⚔️
+            <span class="vid-source-badge badge-douyin">抖音</span>
+            <div class="vid-play-icon"></div>
+          </div>
+          <div class="vid-body">
+            <div class="vid-title">亚瑟S43空A穿墙保姆级教学 · 操作设置详解</div>
+            <div class="vid-meta">
+              <span class="vid-meta-tag">亚瑟</span>
+              <span class="vid-meta-tag">穿墙</span>
+              <span>出品：抖音创作者</span>
+            </div>
+            <a class="vid-go" href="https://www.douyin.com/shipin/7624704379500775443" target="_blank" rel="noopener noreferrer nofollow">
+              前往抖音观看 <span class="vid-go-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 4. 抖音: 元流之子刺客出装教学 -->
+        <div class="vid-card fade-in">
+          <div class="vid-cover" style="background:linear-gradient(135deg,#0a0020,#200050)">
+            🌀
+            <span class="vid-source-badge badge-douyin">抖音</span>
+            <div class="vid-play-icon"></div>
+          </div>
+          <div class="vid-body">
+            <div class="vid-title">元流之子刺客最强出装全局教学 · 顶级打野实战</div>
+            <div class="vid-meta">
+              <span class="vid-meta-tag">出装</span>
+              <span class="vid-meta-tag">全局</span>
+              <span>出品：抖音创作者</span>
+            </div>
+            <a class="vid-go" href="https://www.douyin.com/search/%E7%8E%8B%E8%80%85%E8%8D%A3%E8%80%80s43%E5%85%83%E6%B5%81%E4%B9%8B%E5%AD%90%E6%94%BB%E7%95%A5" target="_blank" rel="noopener noreferrer nofollow">
+              前往抖音搜索 <span class="vid-go-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 5. 王者荣耀官网: 英雄教学视频 -->
+        <div class="vid-card fade-in">
+          <div class="vid-cover" style="background:linear-gradient(135deg,#001a10,#003d20)">
+            🏆
+            <span class="vid-source-badge badge-official">官网</span>
+            <div class="vid-play-icon"></div>
+          </div>
+          <div class="vid-body">
+            <div class="vid-title">王者荣耀官方英雄教学视频 · 赛事与解说大全</div>
+            <div class="vid-meta">
+              <span class="vid-meta-tag">官方</span>
+              <span class="vid-meta-tag">教学</span>
+              <span>出品：王者荣耀官网</span>
+            </div>
+            <a class="vid-go" href="https://pvp.qq.com/v/" target="_blank" rel="noopener noreferrer nofollow">
+              前往官网观看 <span class="vid-go-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 6. 王者荣耀官网: 攻略中心 -->
+        <div class="vid-card fade-in">
+          <div class="vid-cover" style="background:linear-gradient(135deg,#0a1520,#1a3040)">
+            📖
+            <span class="vid-source-badge badge-official">官网</span>
+            <div class="vid-play-icon"></div>
+          </div>
+          <div class="vid-body">
+            <div class="vid-title">王者荣耀攻略中心 · 最新英雄打法与上分攻略</div>
+            <div class="vid-meta">
+              <span class="vid-meta-tag">攻略</span>
+              <span class="vid-meta-tag">上分</span>
+              <span>出品：王者荣耀官网</span>
+            </div>
+            <a class="vid-go" href="https://pvp.qq.com/raiders/" target="_blank" rel="noopener noreferrer nofollow">
+              前往攻略中心 <span class="vid-go-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 7. B站: S43辅助瑶全局教学 -->
+        <div class="vid-card fade-in">
+          <div class="vid-cover" style="background:linear-gradient(135deg,#100520,#250a40)">
+            🛡️
+            <span class="vid-source-badge badge-bilibili">B站</span>
+            <div class="vid-play-icon"></div>
+          </div>
+          <div class="vid-body">
+            <div class="vid-title">S43赛季瑶从0到小国标 · 辅助全局教学</div>
+            <div class="vid-meta">
+              <span class="vid-meta-tag">辅助</span>
+              <span class="vid-meta-tag">瑶</span>
+              <span>出品：B站UP主</span>
+            </div>
+            <a class="vid-go" href="https://www.bilibili.com/video/BV1JrdqBLEvg/" target="_blank" rel="noopener noreferrer nofollow">
+              前往B站观看 <span class="vid-go-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 8. TapTap: S43攻略合集 -->
+        <div class="vid-card fade-in">
+          <div class="vid-cover" style="background:linear-gradient(135deg,#001020,#002040)">
+            📋
+            <span class="vid-source-badge badge-taptap">TapTap</span>
+            <div class="vid-play-icon"></div>
+          </div>
+          <div class="vid-body">
+            <div class="vid-title">王者荣耀S43赛季攻略合集 · 英雄教学与出装推荐</div>
+            <div class="vid-meta">
+              <span class="vid-meta-tag">S43</span>
+              <span class="vid-meta-tag">合集</span>
+              <span>出品：TapTap社区</span>
+            </div>
+            <a class="vid-go" href="https://www.taptap.cn/app/2301/strategy" target="_blank" rel="noopener noreferrer nofollow">
+              前往TapTap查看 <span class="vid-go-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 9. 抖音: S43赛季攻略综合搜索 -->
+        <div class="vid-card fade-in">
+          <div class="vid-cover" style="background:linear-gradient(135deg,#150815,#2a1030)">
+            🔥
+            <span class="vid-source-badge badge-douyin">抖音</span>
+            <div class="vid-play-icon"></div>
+          </div>
+          <div class="vid-body">
+            <div class="vid-title">S43赛季上分攻略 · 各路英雄实战教学合集</div>
+            <div class="vid-meta">
+              <span class="vid-meta-tag">上分</span>
+              <span class="vid-meta-tag">综合</span>
+              <span>出品：抖音创作者</span>
+            </div>
+            <a class="vid-go" href="https://www.douyin.com/search/s43%E8%B5%9B%E5%AD%A3%E7%8E%8B%E8%80%85%E8%8D%A3%E8%80%80%E6%94%BB%E7%95%A5" target="_blank" rel="noopener noreferrer nofollow">
+              前往抖音搜索 <span class="vid-go-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="vid-notice">
+        ⚖️ <strong>声明</strong>：以上链接仅作指路导航，所有视频与内容版权归原作者及出品平台所有，本站不复制、不嵌入、不存储任何视频内容。点击链接将跳转至对应平台观看，请支持原创创作者。
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ========== BOSS攻略 ========== -->
+<div class="page" id="page-boss">
+  <div class="boss-hero">
+    <div>
+      <div class="hero-eyebrow" style="margin-bottom:16px">BOSS GUIDE · S43赛季「陌上相逢」</div>
+      <div class="boss-hero-title">BOSS 攻略大全</div>
+      <p class="boss-hero-sub">掌握每个 BOSS 的刷新节奏与击杀策略 · S43防御塔保护升级 · 血包可共享队友</p>
+    </div>
+  </div>
+
+  <div class="boss-section">
+    <div class="boss-cards">
+
+      <!-- 峡谷暴君 -->
+      <div class="boss-card boss-tyrant fade-in">
+        <div class="boss-layout">
+          <div class="boss-portrait">
+            <div class="boss-portrait-glow"></div>
+            <span class="boss-emoji">🐉</span>
+          </div>
+          <div class="boss-content">
+            <div class="boss-header">
+              <div class="boss-name-wrap">
+                <span class="boss-level">LEGENDARY · TIER S</span>
+                <div class="boss-name">峡谷暴君</div>
+              </div>
+              <div class="boss-badges">
+                <span class="boss-badge badge-time">⏱ 12分钟出现</span>
+                <span class="boss-badge badge-hard">☠ 极限难度</span>
+                <span class="boss-badge badge-spawn">♻ 6分钟刷新</span>
+              </div>
+            </div>
+            <div class="boss-attrs">
+              <div class="boss-attr"><span class="boss-attr-val">120,000</span><span class="boss-attr-key">生命值</span></div>
+              <div class="boss-attr"><span class="boss-attr-val">+30%</span><span class="boss-attr-key">攻击加成</span></div>
+              <div class="boss-attr"><span class="boss-attr-val">90秒</span><span class="boss-attr-key">BUFF时长</span></div>
+            </div>
+            <div class="boss-strategy">
+              <div class="boss-strategy-title">▸ 核心战术要点</div>
+              <div class="boss-tips">
+                <div class="boss-tip">
+                  <div class="boss-tip-num">1</div>
+                  <span>提前在暴君周围插眼布控，特别是草丛和龙穴入口，确保对方无法偷龙且我方视野清晰</span>
+                </div>
+                <div class="boss-tip">
+                  <div class="boss-tip-num">2</div>
+                  <span>推荐时机：摧毁一条外塔后发动，或对方核心英雄死亡冷却期间强行开龙，不要单纯等时间</span>
+                </div>
+                <div class="boss-tip">
+                  <div class="boss-tip-num">3</div>
+                  <span>留一个硬控技能保底（冰冻、眩晕），防止对方英雄偷最后一刀抢龙，关键时刻决定胜负</span>
+                </div>
+                <div class="boss-tip">
+                  <div class="boss-tip-num">4</div>
+                  <span>击杀后立即推进高地，BUFF持续90秒是进攻窗口期，团队需要同步行动不能浪费</span>
+                </div>
+                <div class="boss-tip">
+                  <div class="boss-tip-num" style="background:var(--neon-purple)">S43</div>
+                  <span>S43防御塔保护升级：越塔人数越多减伤越强（最多35%），打暴君推进时注意不要5人越塔</span>
+                </div>
+              </div>
+            </div>
+            <div class="boss-rewards">
+              <div class="reward-chip">🏆 全队攻击力+30%</div>
+              <div class="reward-chip">💨 移速+20%</div>
+              <div class="reward-chip">❤ 持续回血</div>
+              <div class="reward-chip">💰 金币奖励×3</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 主宰 -->
+      <div class="boss-card boss-dominator fade-in">
+        <div class="boss-layout">
+          <div class="boss-portrait">
+            <div class="boss-portrait-glow"></div>
+            <span class="boss-emoji">👑</span>
+          </div>
+          <div class="boss-content">
+            <div class="boss-header">
+              <div class="boss-name-wrap">
+                <span class="boss-level">EPIC · TIER A</span>
+                <div class="boss-name">主宰</div>
+              </div>
+              <div class="boss-badges">
+                <span class="boss-badge badge-time">⏱ 6分钟出现</span>
+                <span class="boss-badge" style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:var(--gold)">★ 高难度</span>
+                <span class="boss-badge badge-spawn">♻ 4分钟刷新</span>
+              </div>
+            </div>
+            <div class="boss-attrs">
+              <div class="boss-attr"><span class="boss-attr-val">65,000</span><span class="boss-attr-key">生命值</span></div>
+              <div class="boss-attr"><span class="boss-attr-val">+15%</span><span class="boss-attr-key">全能加成</span></div>
+              <div class="boss-attr"><span class="boss-attr-val">60秒</span><span class="boss-attr-key">BUFF时长</span></div>
+            </div>
+            <div class="boss-strategy">
+              <div class="boss-strategy-title">▸ 核心战术要点</div>
+              <div class="boss-tips">
+                <div class="boss-tip">
+                  <div class="boss-tip-num">1</div>
+                  <span>主宰在游戏前中期至关重要，6分钟可以开始打，每次击杀后全队经验大幅提升，比卡线更有效率</span>
+                </div>
+                <div class="boss-tip">
+                  <div class="boss-tip-num">2</div>
+                  <span>打主宰期间需要分配1名英雄反蹲对方打野，防止对方趁机骚扰。辅助带大眼守住视野</span>
+                </div>
+                <div class="boss-tip">
+                  <div class="boss-tip-num">3</div>
+                  <span>主宰会释放"金色怒涛"技能，造成范围减速，坦克前排需要在技能前站位，为输出位争取空间</span>
+                </div>
+                <div class="boss-tip">
+                  <div class="boss-tip-num" style="background:var(--neon-purple)">S43</div>
+                  <span>S43血包共享机制：辅助拾取血包后可共享给身边队友，打主宰时辅助可以边补给边提供视野</span>
+                </div>
+              </div>
+            </div>
+            <div class="boss-rewards">
+              <div class="reward-chip">⚡ 全队经验+15%</div>
+              <div class="reward-chip">🛡 防御增强</div>
+              <div class="reward-chip">💰 金币+500</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 风暴龙王 -->
+      <div class="boss-card boss-dragon fade-in">
+        <div class="boss-layout">
+          <div class="boss-portrait">
+            <div class="boss-portrait-glow"></div>
+            <span class="boss-emoji">🌩</span>
+          </div>
+          <div class="boss-content">
+            <div class="boss-header">
+              <div class="boss-name-wrap">
+                <span class="boss-level">RARE · TIER B</span>
+                <div class="boss-name">风暴龙王</div>
+              </div>
+              <div class="boss-badges">
+                <span class="boss-badge badge-time">⏱ 3分钟出现</span>
+                <span class="boss-badge" style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--neon-blue)">⚡ 中等难度</span>
+                <span class="boss-badge badge-spawn">♻ 3分钟刷新</span>
+              </div>
+            </div>
+            <div class="boss-attrs">
+              <div class="boss-attr"><span class="boss-attr-val">40,000</span><span class="boss-attr-key">生命值</span></div>
+              <div class="boss-attr"><span class="boss-attr-val">+10%</span><span class="boss-attr-key">法术增益</span></div>
+              <div class="boss-attr"><span class="boss-attr-val">45秒</span><span class="boss-attr-key">BUFF时长</span></div>
+            </div>
+            <div class="boss-strategy">
+              <div class="boss-strategy-title">▸ 核心战术要点</div>
+              <div class="boss-tips">
+                <div class="boss-tip">
+                  <div class="boss-tip-num">1</div>
+                  <span>风暴龙王刷新频率最高，全场应尽量保持5次以上击杀，龙层积累后BUFF效果大幅提升</span>
+                </div>
+                <div class="boss-tip">
+                  <div class="boss-tip-num">2</div>
+                  <span>龙穴位于地图左下角，打野英雄在进行龙区控制时优先选择清龙，不要被对方抢走计数优势</span>
+                </div>
+                <div class="boss-tip">
+                  <div class="boss-tip-num">3</div>
+                  <span>风暴龙王在血量低于30%时会进入狂暴状态，攻击频率翻倍，注意坦克血量不要硬顶</span>
+                </div>
+                <div class="boss-tip">
+                  <div class="boss-tip-num" style="background:var(--neon-purple)">S43</div>
+                  <span>S43草丛信号同步：龙区草丛内的信号会同步到小地图，打龙王时标记草丛队友能实时看到，防偷龙更稳</span>
+                </div>
+              </div>
+            </div>
+            <div class="boss-rewards">
+              <div class="reward-chip">🔮 法术强度+10%</div>
+              <div class="reward-chip">💨 移速+10%</div>
+              <div class="reward-chip">📈 龙层叠加</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- S43赛季战场改动 -->
+    <div class="sub-section" style="margin-top:40px">
+      <div class="sub-sec-title">⚡ S43赛季战场机制改动</div>
+      <div class="sub-sec-desc">S43「陌上相逢」版本对战场体验做了重要优化，影响每一场对局</div>
+      <div class="items-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">
+        <div class="item-card fade-in" data-rarity="epic" style="border-color:rgba(255,215,0,0.2)">
+          <div class="item-top">🛡️</div>
+          <div class="item-body">
+            <div class="item-name">防御塔保护升级</div>
+            <div class="item-type">S43新增机制</div>
+            <div class="item-desc">敌方越塔人数越多，防御塔对己方英雄的减伤效果越强，<strong>最多减少35%伤害</strong>。越塔强杀风险大增！</div>
+          </div>
+        </div>
+        <div class="item-card fade-in" data-rarity="epic" style="border-color:rgba(0,212,255,0.2)">
+          <div class="item-top">❤️</div>
+          <div class="item-body">
+            <div class="item-name">血包共享机制</div>
+            <div class="item-type">S43新增机制</div>
+            <div class="item-desc">辅助拾取血包后可<strong>共享给身边队友</strong>，不再浪费回复，辅助游走时也能帮队友补给。</div>
+          </div>
+        </div>
+        <div class="item-card fade-in" data-rarity="epic" style="border-color:rgba(180,74,255,0.2)">
+          <div class="item-top">👁️</div>
+          <div class="item-body">
+            <div class="item-name">草丛信号同步</div>
+            <div class="item-type">S43新增机制</div>
+            <div class="item-desc">草丛内的信号会<strong>同步到小地图</strong>，队友能更清楚看到你的信号指示，沟通效率大幅提升。</div>
+          </div>
+        </div>
+        <div class="item-card fade-in" data-rarity="epic" style="border-color:rgba(255,45,120,0.2)">
+          <div class="item-top">⚔️</div>
+          <div class="item-body">
+            <div class="item-name">新召唤师技能「汇流成兵」</div>
+            <div class="item-type">S43限时新技能</div>
+            <div class="item-desc">根据职业召唤不同元流武器：刺客双爪/坦克重盾/法师法器/射手重弩/辅助古琴，<strong>适配各职业打法</strong>。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="page" id="page-items">
+  <div class="items-hero">
+    <div>
+      <div class="hero-eyebrow" style="margin-bottom:16px">HIDDEN ITEMS · S43赛季「陌上相逢」</div>
+      <div class="items-hero-title">隐藏道具 & 新装备大全</div>
+      <p class="items-hero-sub">S43赛季新装备幽影袖箭上线 · 名刀·司命重做升级 · 峡谷秘密宝藏全收录</p>
+    </div>
+  </div>
+
+  <div class="items-filter-bar">
+    <button class="ifilter-btn active" onclick="filterItems(this,'all')">全部道具</button>
+    <button class="ifilter-btn" onclick="filterItems(this,'new')">S43新装备</button>
+    <button class="ifilter-btn" onclick="filterItems(this,'legendary')">传说级</button>
+    <button class="ifilter-btn" onclick="filterItems(this,'epic')">史诗级</button>
+    <button class="ifilter-btn" onclick="filterItems(this,'rare')">稀有级</button>
+    <button class="ifilter-btn" onclick="filterItems(this,'secret')">隐藏专属</button>
+  </div>
+
+  <!-- 地图隐藏区域概览 -->
+  <div class="map-overview fade-in">
+    <div class="map-header">
+      <div>
+        <div class="map-header-title">🗺 峡谷隐藏区域全图索引</div>
+        <div class="map-header-sub">点击区域查看该区域所有可获取的隐藏道具</div>
+      </div>
+    </div>
+    <div class="map-body">
+      <div class="map-regions">
+        <div class="map-region" onclick="showMapRegion('北区秘境')">
+          <div class="mr-name">北区秘境 <span class="mr-count">2件</span></div>
+          <div class="mr-items">
+            <div class="mr-item-line"><div class="mr-item-dot" style="background:var(--gold)"></div>蚀月宝珠（传说）</div>
+            <div class="mr-item-line"><div class="mr-item-dot" style="background:var(--neon-purple)"></div>炎界圣典（史诗）</div>
+          </div>
+        </div>
+        <div class="map-region" onclick="showMapRegion('中路秘域')">
+          <div class="mr-name">中路秘域 <span class="mr-count">2件</span></div>
+          <div class="mr-items">
+            <div class="mr-item-line"><div class="mr-item-dot" style="background:var(--neon-pink)"></div>虚空裂缝符（隐藏）</div>
+            <div class="mr-item-line"><div class="mr-item-dot" style="background:var(--neon-blue)"></div>雷霆战核（稀有）</div>
+          </div>
+        </div>
+        <div class="map-region" onclick="showMapRegion('东侧神殿')">
+          <div class="mr-name">东侧神殿 <span class="mr-count">1件</span></div>
+          <div class="mr-items">
+            <div class="mr-item-line"><div class="mr-item-dot" style="background:var(--neon-purple)"></div>不灭守望（史诗）</div>
+          </div>
+        </div>
+        <div class="map-region" onclick="showMapRegion('右下祭坛')">
+          <div class="mr-name">右下祭坛 <span class="mr-count">1件</span></div>
+          <div class="mr-items">
+            <div class="mr-item-line"><div class="mr-item-dot" style="background:var(--neon-pink)"></div>亡者低语（隐藏）</div>
+          </div>
+        </div>
+        <div class="map-region" onclick="showMapRegion('南部河道')">
+          <div class="mr-name">南部河道 <span class="mr-count">2件</span></div>
+          <div class="mr-items">
+            <div class="mr-item-line"><div class="mr-item-dot" style="background:var(--neon-blue)"></div>深潮之力（稀有）</div>
+            <div class="mr-item-line"><div class="mr-item-dot" style="background:var(--neon-blue)"></div>疾风羽翼（稀有）</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="items-section">
+
+    <!-- S43赛季新装备 -->
+    <div class="sub-section">
+      <div class="sub-sec-title">🆕 S43赛季新装备 & 装备改动</div>
+      <div class="sub-sec-desc">S43「陌上相逢」赛季全新装备上线，装备体系重大调整，改变出装思路</div>
+      <div class="items-grid" id="newEquipItems">
+
+        <div class="item-card rarity-legendary fade-in" data-rarity="new">
+          <div class="item-top">
+            🥷
+            <div class="item-rarity-badge" style="background:linear-gradient(90deg,var(--neon-purple),var(--neon-pink))">S43新装</div>
+          </div>
+          <div class="item-body">
+            <div class="item-name">幽影袖箭</div>
+            <div class="item-type">射手/刺客 · S43赛季全新装备</div>
+            <div class="item-desc"><strong>攻速+20% · 暴击+20% · 生命+600 · 移速+7.5%</strong><br>主动：进入<strong>2.5秒隐身</strong>（近战1.25秒），隐身期间每0.5秒回复生命值，血量越低回复越多。敌方普攻无法锁定，吃伤害不破隐，只有自己主动输出才退出隐身。冷却75秒。</div>
+            <div class="item-location">
+              <span class="item-loc-label">📍</span>
+              <span>售价2040金币。射手保命神器！高爆发刺客同样契合，进场输出后隐身撤离</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card rarity-legendary fade-in" data-rarity="new">
+          <div class="item-top">
+            🗡️
+            <div class="item-rarity-badge" style="background:linear-gradient(90deg,var(--gold2),var(--gold))">S43重做</div>
+          </div>
+          <div class="item-body">
+            <div class="item-name">名刀·司命（重做）</div>
+            <div class="item-type">全职业 · S43赛季重做升级</div>
+            <div class="item-desc"><strong>核心改动</strong>：取消近战/远程无敌时间区分，统一1秒基础无敌。<strong>新增自动升级机制</strong>：每90秒提升5%基础属性+0.25秒无敌时间，最多升级3次，满级无敌时间<strong>1.75秒</strong>！满级需持有4分30秒。</div>
+            <div class="item-location">
+              <span class="item-loc-label">📍</span>
+              <span>升级后卖掉重买需重新计时。预计成为输出英雄核心装备，后期1.75秒无敌等于第二条命</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card rarity-epic fade-in" data-rarity="new">
+          <div class="item-top">
+            📘
+            <div class="item-rarity-badge" style="background:linear-gradient(90deg,#0088ff,#00d4ff)">S43加强</div>
+          </div>
+          <div class="item-body">
+            <div class="item-name">回响之杖（加强）</div>
+            <div class="item-type">法师 · S43赛季加强</div>
+            <div class="item-desc">S43加强调整：与梦魇之牙统一售价和AP加成。被动弹射伤害增强，凭借爆发优势<strong>重回法师主流装备</strong>选择。</div>
+            <div class="item-location">
+              <span class="item-loc-label">📍</span>
+              <span>元法等法师核心出装，S43吃到装备红利，胜率大幅提升</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card rarity-epic fade-in" data-rarity="new">
+          <div class="item-top">
+            📕
+            <div class="item-rarity-badge" style="background:linear-gradient(90deg,#ff4444,#ff6666)">S43削弱</div>
+          </div>
+          <div class="item-body">
+            <div class="item-name">梦魇之牙（削弱）</div>
+            <div class="item-type">法师 · S43赛季平衡调整</div>
+            <div class="item-desc">S43削弱调整：与回响之杖统一售价和AP加成，回归设计初衷——<strong>针对高续航阵容的克制装备</strong>，不再是法师无脑首选。</div>
+            <div class="item-location">
+              <span class="item-loc-label">📍</span>
+              <span>对面有程咬金/蔡文姬等高回复英雄时仍必出，但常规对局优先回响之杖</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 专属道具获取 -->
+    <div class="sub-section">
+      <div class="sub-sec-title">🔒 专属道具获取方法</div>
+      <div class="sub-sec-desc">以下道具需要满足特定条件或到达特定地点才能拾取，掌握获取时机事半功倍</div>
+      <div class="items-grid" id="specialItems">
+
+        <div class="item-card rarity-secret fade-in" data-rarity="secret">
+          <div class="item-top">
+            💀
+            <div class="item-rarity-badge">隐藏</div>
+            <div class="item-lock">🔒 职业限定</div>
+          </div>
+          <div class="item-body">
+            <div class="item-name">亡者低语</div>
+            <div class="item-type">暗杀类 · 仅刺客可用</div>
+            <div class="item-desc">普攻附带<strong>暗毒</strong>效果，对目标每秒造成其最大生命值<strong>2%</strong>的真实伤害，持续5秒，不可叠加。S43赛季刺客英雄适配新装备幽影袖箭，隐身+暗毒双重收割更加致命。</div>
+            <div class="item-location">
+              <span class="item-loc-label">📍</span>
+              <span>地图右下角废弃祭坛，仅在游戏20分钟后（夜间时段）激活，靠近祭坛中央火焰拾取</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card rarity-secret fade-in" data-rarity="secret">
+          <div class="item-top">
+            🌀
+            <div class="item-rarity-badge">隐藏</div>
+            <div class="item-lock">⚡ 全场唯一</div>
+          </div>
+          <div class="item-body">
+            <div class="item-name">虚空裂缝符</div>
+            <div class="item-type">全职业 · 全场限1个</div>
+            <div class="item-desc">激活后<strong>5秒内</strong>可穿越地图任意障碍物，全程无碰撞体积，用于逃脱或奇袭均极为强力。S43赛季配合新召唤师技能「汇流成兵」使用效果更佳，穿越障碍+元流武器双重增幅。</div>
+            <div class="item-location">
+              <span class="item-loc-label">📍</span>
+              <span>游戏时钟整点（10/20/30分钟）时在地图中心空地生成，先到先得，每场最多出现3次</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card rarity-legendary fade-in" data-rarity="legendary">
+          <div class="item-top">
+            🌙
+            <div class="item-rarity-badge">传说</div>
+          </div>
+          <div class="item-body">
+            <div class="item-name">蚀月宝珠</div>
+            <div class="item-type">法术类 · 全职业</div>
+            <div class="item-desc">攻击有<strong>20%概率</strong>触发月蚀，造成<strong>150%</strong>法术伤害并回复150生命，每场最多触发3次。S43赛季回响之杖加强后，法师携带此道具爆发能力更上一层楼。</div>
+            <div class="item-location">
+              <span class="item-loc-label">📍</span>
+              <span>北区秘境石碑后方，连续触碰石碑3次后激活，出现后限时15秒内拾取否则消失</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card rarity-legendary fade-in" data-rarity="legendary">
+          <div class="item-top">
+            🔥
+            <div class="item-rarity-badge">传说</div>
+          </div>
+          <div class="item-body">
+            <div class="item-name">炎界圣典</div>
+            <div class="item-type">法师专属 · 传说级</div>
+            <div class="item-desc">技能命中附带<strong>灼烧</strong>，每秒造成法术加成<strong>8%</strong>的火焰伤害，可叠加<strong>5层</strong>，满层时爆发一次额外伤害。S43赛季梦魇之牙削弱后，此道具的灼烧效果成为法师替代选择。</div>
+            <div class="item-location">
+              <span class="item-loc-label">📍</span>
+              <span>北区西侧火焰祭坛，必须先击败守卫祭坛的精英野怪（HP约8000），击败后道具出现</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 地图隐藏物资 -->
+    <div class="sub-section">
+      <div class="sub-sec-title">🗺 地图隐藏物资</div>
+      <div class="sub-sec-desc">分散在峡谷各处的强力增益物资 · S43血包共享 & 草丛信号让物资争夺更激烈</div>
+      <div class="items-grid" id="mapItems">
+
+        <div class="item-card rarity-epic fade-in" data-rarity="epic">
+          <div class="item-top">
+            ⚡
+            <div class="item-rarity-badge">史诗</div>
+          </div>
+          <div class="item-body">
+            <div class="item-name">雷霆战核</div>
+            <div class="item-type">全队增益 · 史诗级</div>
+            <div class="item-desc">激活后为全队提供<strong>雷电护盾</strong>，可抵挡一次致命伤害，盾量随等级提升，冷却时间<strong>120秒</strong>。</div>
+            <div class="item-location">
+              <span class="item-loc-label">📍</span>
+              <span>中路上方雷击平台，仅在游戏内天气为"雷雨"时刷新，约每局出现2~3次。S43草丛信号同步后，拾取时队友可在小地图实时看到你的信号</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card rarity-epic fade-in" data-rarity="epic">
+          <div class="item-top">
+            🛡️
+            <div class="item-rarity-badge">史诗</div>
+          </div>
+          <div class="item-body">
+            <div class="item-name">不灭守望</div>
+            <div class="item-type">坦克专属 · 史诗级</div>
+            <div class="item-desc">持有者血量低于<strong>15%</strong>时自动触发，持续8秒获得<strong>50%</strong>伤害减免并每秒回复300生命值。</div>
+            <div class="item-location">
+              <span class="item-loc-label">📍</span>
+              <span>东侧神殿最深处宝箱内，需携带"古老钥匙"（击败暗影魔像后100%掉落）方可开启。S43防御塔保护升级后，此区域越塔取道具风险降低</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card rarity-rare fade-in" data-rarity="rare">
+          <div class="item-top">
+            🌊
+            <div class="item-rarity-badge">稀有</div>
+          </div>
+          <div class="item-body">
+            <div class="item-name">深潮之力</div>
+            <div class="item-type">全队增益 · 稀有级</div>
+            <div class="item-desc">全队<strong>移速+15%</strong>，持续30秒。在水域区域内使用时效果翻倍变为<strong>+30%</strong>。</div>
+            <div class="item-location">
+              <span class="item-loc-label">📍</span>
+              <span>地图南部河道中央浮岛上，每8分钟固定刷新一次，需借助英雄跳跃技能到达。S43血包共享机制后，辅助可在河道补给时顺手拾取分享给队友</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card rarity-rare fade-in" data-rarity="rare">
+          <div class="item-top">
+            💨
+            <div class="item-rarity-badge">稀有</div>
+          </div>
+          <div class="item-body">
+            <div class="item-name">疾风羽翼</div>
+            <div class="item-type">刺客/射手 · 稀有级</div>
+            <div class="item-desc">获得<strong>攻速+40%</strong>，持续15秒。追杀血量低于50%目标时效果额外提升<strong>+20%</strong>，适合收尾。</div>
+            <div class="item-location">
+              <span class="item-loc-label">📍</span>
+              <span>地图东北高地树林边缘，飞鸟聚集处地面发光点，每10分钟刷新</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 英雄详情弹窗 -->
+<div class="hero-modal-overlay" id="heroModal" onclick="if(event.target===this)closeHeroModal()">
+  <div class="hero-modal" id="heroModalContent"></div>
+</div>
+
+<!-- Toast提示 -->
+<div id="toast"></div>
+
+<script>
+/* ========== 全局状态 ========== */
+let currentPage = 'home';
+
+/* ========== 页面切换 ========== */
+function showPage(name) {
+  // 隐藏所有页面
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
+  // 显示目标页面
+  const target = document.getElementById('page-' + name);
+  if (target) {
+    target.classList.add('active');
+    target.style.display = 'block';
+    window.scrollTo({top:0, behavior:'smooth'});
+    currentPage = name;
+  }
+  // 更新导航栏高亮
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.toggle('active', a.dataset.page === name);
+  });
+  // 关闭移动端菜单
+  const navLinks = document.getElementById('navLinks');
+  if (navLinks) navLinks.classList.remove('open');
+  // 触发入场动画
+  setTimeout(triggerFadeIn, 80);
+  setTimeout(triggerFadeIn, 300);
+}
+
+function navClick(e, name) {
+  if (e) e.preventDefault();
+  if (e) e.stopPropagation();
+  showPage(name);
+  return false;
+  showPage(name);
+}
+
+/* ========== 移动端菜单 ========== */
+function toggleMenu() {
+  document.getElementById('navLinks').classList.toggle('open');
+}
+
+/* ========== Toast ========== */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ========== 数字滚动动画 ========== */
+function countUp(id, target, suffix) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let cur = 0;
+  const step = Math.ceil(target / 60);
+  const t = setInterval(() => {
+    cur = Math.min(cur + step, target);
+    el.textContent = cur + (suffix || '');
+    if (cur >= target) clearInterval(t);
+  }, 20);
+}
+
+/* ========== 入场动画（IntersectionObserver + 兜底） ========== */
+function triggerFadeIn() {
+  const els = document.querySelectorAll('.page.active .fade-in:not(.visible)');
+  // 强制检查视窗内的元素
+  els.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 50) {
+      el.classList.add('visible');
+    }
+  });
+}
+
+// IntersectionObserver
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, { threshold: 0.05, rootMargin: '0px 0px 30px 0px' });
+
+function observeAll() {
+  document.querySelectorAll('.fade-in').forEach(el => io.observe(el));
+}
+
+// 兜底：页面加载和滚动时都强制检查
+window.addEventListener('scroll', triggerFadeIn, { passive: true });
+window.addEventListener('load', () => { observeAll(); triggerFadeIn(); setTimeout(triggerFadeIn, 500); });
+setTimeout(() => { triggerFadeIn(); }, 200);
+setTimeout(() => {
+  // 最终兜底：1.5秒后强制所有 fade-in 变为可见
+  document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+}, 1500);
+
+/* ========== 英雄数据 ========== */
+const heroData = [
+  {name:'亚瑟',role:'warrior',emoji:'⚔️',label:'战士',detail:{
+    title:'圣骑之力 · 亚瑟',subtitle:'圣光不灭，正义永存',difficulty:'★☆☆☆☆',position:'对抗路',tier:'T0',
+    skills:[
+      {name:'圣光守护（被动）',desc:'亚瑟获得圣光守护，每2秒回复自身最大生命值2%。续航能力极强，对线换血永远不亏。'},
+      {name:'誓约之盾（一技能）【S43加强】',desc:'亚瑟召唤圣盾冲锋，获得30%移速加成，下次普攻跳斩目标并沉默1秒。S43新增：无目标时可朝指定方向空放位移，可穿墙！机动性质变，追击逃生全面升级。'},
+      {name:'回旋打击（二技能）',desc:'亚瑟召唤圣盾在身边旋转，持续5秒对周围敌人造成物理伤害。清兵和持续输出的核心技能。'},
+      {name:'圣剑裁决（三技能）',desc:'亚瑟举起圣剑跳斩敌方英雄，造成法术伤害并根据目标已损生命值额外增伤，目标血量越低伤害越高。'}
+    ],
+    builds:[
+      {name:'抵抗之靴',desc:'减少控制时间，进场更稳'},
+      {name:'冰痕之握',desc:'减速留人，强化普攻配合一技能'},
+      {name:'暗影战斧',desc:'冷却+穿透+生命，战士万金油'},
+      {name:'极寒风暴',desc:'护甲+冷却，近身持续输出'},
+      {name:'魔女斗篷',desc:'法术防御核心，对抗法师必备'},
+      {name:'反伤刺甲',desc:'反弹普攻伤害，克制射手'}
+    ],
+    runes:'红色10异变 + 绿色10均衡 + 蓝色10狩猎',combos:['1-A-2-3（经典沉默追杀）','2-1-A-3（先手沉默接爆发）','1-3-A-2（跳斩沉默接大招斩杀）'],
+    tips:['一技能沉默是神技，用来打断对面关键技能比伤害更重要','被动回血让你对线无敌，不惧换血但也要注意爆发秒杀','大招对低血量目标增伤，不要浪费在满血人身上','后期一技能加速开团，沉默对面核心输出位即可撤出','出半肉半输出，纯肉没伤害纯输出扛不住']
+  }},
+  {name:'廉颇',role:'warrior',emoji:'🛡',label:'战士',detail:{
+    title:'正义爆轰 · 廉颇',subtitle:'铁壁之躯，以暴制暴',difficulty:'★★☆☆☆',position:'对抗路',tier:'T2',
+    skills:[
+      {name:'坚盾（被动）',desc:'廉颇释放技能时获得20%免伤和霸体效果。这让他在团战中几乎无法被控制，硬吃伤害还能全身而退。'},
+      {name:'翻滚突击（一技能）【S43调整】',desc:'廉颇向指定方向冲锋，击飞路径上敌人并造成物理伤害。S43伤害加成改为基于额外攻击力，新增基于敌方最大生命值百分比伤害，从肉坦向战士转型。'},
+      {name:'磐岩壁垒（二技能）',desc:'廉颇短暂蓄力后砸击前方，造成范围物理伤害并减速敌人。蓄力期间获得护盾，对线消耗神技。'},
+      {name:'破阵冲击（三技能）【S43调整】',desc:'廉颇跃起后重砸地面，造成三次递增的物理伤害，最后一次击飞敌人。S43伤害机制同步调整，出攻击装收益更高。'}
+    ],
+    builds:[
+      {name:'影忍之足',desc:'物防鞋，减少普攻伤害'},
+      {name:'暗影战斧',desc:'冷却+穿透，提升输出能力'},
+      {name:'反伤刺甲',desc:'反弹普攻伤害，克制射手'},
+      {name:'魔女斗篷',desc:'法防核心装备'},
+      {name:'不祥征兆',desc:'减速攻速+高护甲'},
+      {name:'血魔之怒',desc:'低血量增伤，提升残血反杀能力'}
+    ],
+    runes:'红色10异变 + 绿色10均衡 + 蓝色10隐匿',combos:['1-3-2（经典开团连招）','1-2-A-3（突进消耗接大招）','3-1-2（跳大接冲锋追击）'],
+    tips:['技能释放时自带霸体，不用担心被打断','一技能冲锋距离很远，可以穿墙Gank','大招三段伤害递增，尽量让第三段砸到更多敌人','团战你就是开团机器，不用犹豫直接冲','出装以坦度为主，活着的廉颇才有输出']
+  }},
+  {name:'铠',role:'warrior',emoji:'🪖',label:'战士',detail:{
+    title:'暗影之铠 · 铠',subtitle:'暗影降临，一刀封喉',difficulty:'★★☆☆☆',position:'对抗路',tier:'T1',
+    skills:[
+      {name:'极刃风暴（被动）',desc:'铠的普攻和二技能命中单个目标时额外造成50%伤害。单挑之王的核心，1v1几乎无敌。'},
+      {name:'回旋之刃（一技能）',desc:'铠投掷回旋刀刃，对路径敌人造成伤害和减速，命中后回复自身生命值并减少该技能1秒冷却。'},
+      {name:'极刃冲锋（二技能）',desc:'铠向指定方向冲刺，对路径敌人造成伤害，下一次普攻强化为冲砍。核心位移+输出技能。'},
+      {name:'不灭魔躯（三技能）',desc:'铠召唤暗影之躯，获得攻击力、移速和伤害格挡，持续8秒。变身后的铠刀刀致命。'}
+    ],
+    builds:[
+      {name:'抵抗之靴',desc:'减少控制，确保进场输出'},
+      {name:'暗影战斧',desc:'冷却穿透生命，战士核心'},
+      {name:'无尽战刃',desc:'暴击加成，一刀流核心'},
+      {name:'宗师之力',desc:'强化普攻，二技能后爆发翻倍'},
+      {name:'碎星锤',desc:'打坦克必备穿透'},
+      {name:'名刀·司命',desc:'残血保命，一刀流容错'}
+    ],
+    runes:'红色10祸源 + 绿色10鹰眼 + 蓝色10狩猎',combos:['3-2-A-1-A（变身冲刺一刀流）','1-2-A-3-A（消耗接变身收割）','2-A-1-A-3（先手消耗再变身追击）'],
+    tips:['被动单挑加成50%伤害，1v1永远不怂','大招变身8秒是强势期，必须在变身期间打出全部输出','一技能命中回血+减CD，对线续航能力极强','二技能冲砍配合宗师一刀可以秒脆皮','团战等对面交了控制再进场，变身后的铠是后排噩梦']
+  }},
+  {name:'曹操',role:'warrior',emoji:'🔱',label:'战士',detail:{
+    title:'浴火枭雄 · 曹操',subtitle:'血战不休，浴火重生',difficulty:'★★★☆☆',position:'对抗路',tier:'T2',
+    skills:[
+      {name:'争霸（被动）',desc:'曹操每次释放技能增加10%攻速，最多叠加5层持续5秒。技能穿插普攻是核心输出方式。'},
+      {name:'霸道之刃（一技能）',desc:'曹操向指定方向发起斩击，造成物理伤害。命中英雄可再次释放，最多连续3次，第三次击飞敌人。'},
+      {name:'纵横天下（二技能）',desc:'曹操挥出剑气对前方敌人造成伤害和减速，命中英雄回复自身生命值。消耗和续航的关键。'},
+      {name:'浴火重生（三技能）',desc:'曹操解除自身控制并回复已损生命值20%，同时获得韧性加成。残血反杀的核心技能。'}
+    ],
+    builds:[
+      {name:'抵抗之靴',desc:'减控+韧性，配合大招几乎免控'},
+      {name:'暗影战斧',desc:'冷却穿透生命，战士标配'},
+      {name:'宗师之力',desc:'强化普攻，技能间穿插爆发'},
+      {name:'不死鸟之眼',desc:'低血量增伤+法防，残血之神'},
+      {name:'暴烈之甲',desc:'受伤增攻速，配合被动越打越快'},
+      {name:'血魔之怒',desc:'低血量护盾+增伤，残血战神'}
+    ],
+    runes:'红色10红月 + 绿色10鹰眼 + 蓝色10狩猎',combos:['1-1-1-A-3-A-2（三段斩击接大招反杀）','2-1-A-1-A-1-3（减速追击连招）','3-1-1-1-2-A（先解控再反打）'],
+    tips:['大招解控+回血是核心，被控时使用就是反杀信号','被动5层攻速加成极高，技能之间必须穿插普攻','一技能三段位移非常灵活，第三段击飞留人很关键','残血不要慌，大招+不死鸟让你瞬间回满','对线期用二技能消耗回血，稳住就能赢']
+  }},
+  {name:'貂蝉',role:'mage',emoji:'🌸',label:'法师',detail:{
+    title:'离殇之舞 · 貂蝉',subtitle:'舞姿惑心，花语弑魂',difficulty:'★★★★☆',position:'中路',tier:'T0',
+    skills:[
+      {name:'语华（被动）',desc:'貂蝉技能命中敌人叠加印记，4层触发爆炸造成真实伤害并回复自身生命值。这是貂蝉持续输出的核心。'},
+      {name:'落雁追月（一技能）',desc:'貂蝉向指定方向投出花球，对路径敌人造成法术伤害。命中后花球返回再次造成伤害。消耗和叠印记的核心。'},
+      {name:'缘心结（二技能）',desc:'貂蝉瞬间位移到指定位置，散发三枚花球攻击附近敌人并叠印记。核心位移技能，CD极短。'},
+      {name:'绽风华（三技能）',desc:'貂蝉在身边展开法阵，法阵存在期间一技能和二技能冷却大幅缩减。貂蝉无限连招的源泉。'}
+    ],
+    builds:[
+      {name:'冷静之靴',desc:'冷却缩减核心，技能频率决定伤害'},
+      {name:'噬神之书',desc:'法术吸血，配合被动回血永不停歇'},
+      {name:'痛苦面具',desc:'法穿+被动百分比伤害，叠印记更快'},
+      {name:'极寒风暴',desc:'护甲+冷却，近身法师必备防御'},
+      {name:'博学者之怒',desc:'法强大幅提升，后期伤害质变'},
+      {name:'虚无法杖',desc:'百分比法穿，打坦克也能出真伤'}
+    ],
+    runes:'红色10梦魇 + 绿色10心眼 + 蓝色10狩猎',combos:['2-1-2-1-2-1（大招内无限连招）','1-2-1（快速叠印记爆炸）','2-1-2-3-2-1（开大持续输出连招）'],
+    tips:['大招范围内二技能CD极短，是大招内无限位移的保证','被动真伤爆炸无视防御，打坦克也痛','二技能位移要精准，空放浪费CD还会断连招','注意蓝量管理，没蓝的貂蝉毫无战斗力','团战等控制交完再进场，在法阵内翩翩起舞']
+  }},
+  {name:'王昭君',role:'mage',emoji:'❄️',label:'法师',detail:{
+    title:'凛冬之息 · 王昭君',subtitle:'冰霜禁锢，凛冬永驻',difficulty:'★★☆☆☆',position:'中路',tier:'T1',
+    skills:[
+      {name:'冰封之心（被动）',desc:'王昭君脱战后获得寒冰护盾，护盾被打破时对周围敌人造成法术伤害和减速。提供额外的自保和消耗能力。'},
+      {name:'冰封之矛（一技能）',desc:'王昭君向指定方向投出冰矛，对命中的第一个敌人造成法术伤害并减速。主要消耗技能。'},
+      {name:'凤凰于飞（二技能）',desc:'王昭君召唤冰凤凰，对指定区域造成法术伤害并将敌人冻结1秒。关键控制技能。'},
+      {name:'凛冬降临（三技能）',desc:'王昭君在指定位置召唤暴风雪，持续5秒对范围内敌人造成持续法术伤害和减速。毁天灭地的AOE大招。'}
+    ],
+    builds:[
+      {name:'秘法之靴',desc:'法穿鞋，提升前期伤害'},
+      {name:'痛苦面具',desc:'法穿+被动百分比，消耗能力翻倍'},
+      {name:'博学者之怒',desc:'法强大件，伤害质变'},
+      {name:'虚无法杖',desc:'百分比法穿，后期打坦克'},
+      {name:'辉月',desc:'主动免伤，保命神器'},
+      {name:'贤者之书',desc:'大量法强，终极伤害装备'}
+    ],
+    runes:'红色10梦魇 + 绿色10心眼 + 蓝色10狩猎',combos:['2-3-1（冰冻接大招接冰矛）','1-2-3（减速冰冻再下暴风雪）','2-1-A-3（冰冻消耗接大招收割）'],
+    tips:['二技能冰冻是命脉，冻住人再放大招伤害爆炸','大招可移动施放，注意走位保证持续命中','被动护盾被打破有AOE伤害，贴脸输出也有收益','团战先冻关键人物再放大，范围减速让对面跑不掉','注意自身脆弱，不要为了输出走到前排']
+  }},
+  {name:'嬴政',role:'mage',emoji:'⚡',label:'法师',detail:{
+    title:'始皇之怒 · 嬴政',subtitle:'天子一怒，伏尸百万',difficulty:'★★★☆☆',position:'中路',tier:'T1',
+    skills:[
+      {name:'王者审判（被动）',desc:'嬴政的普攻附带法术伤害并可以穿透目标。让他的普攻也有不俗的清线和消耗能力。'},
+      {name:'王者惩戒（一技能）',desc:'嬴政在指定区域召唤法阵，对范围内敌人造成法术伤害并减速。清线和封走位的好技能。'},
+      {name:'至尊王权（二技能）',desc:'嬴政开启王权护盾，获得移速加成并持续对附近敌人造成法术伤害。近身自保和加速赶路都好用。'},
+      {name:'始皇裁决（三技能）',desc:'嬴政蓄力后射出激光，对路径上所有敌人造成高额法术伤害。超远射程的团战核弹。'}
+    ],
+    builds:[
+      {name:'秘法之靴',desc:'法穿提升前期伤害'},
+      {name:'回响之杖',desc:'移速+被动弹射，强化消耗'},
+      {name:'博学者之怒',desc:'法强核心，伤害质变'},
+      {name:'虚无法杖',desc:'百分比法穿打坦克'},
+      {name:'辉月',desc:'主动免伤保命'},
+      {name:'贤者之书',desc:'终极法强装备'}
+    ],
+    runes:'红色10梦魇 + 绿色10心眼 + 蓝色10狩猎',combos:['1-3（法阵减速接激光收割）','2-1-3（加速贴近法阵再射激光）','1-2-A-3（法阵接护盾普攻接大招）'],
+    tips:['大招激光射程极远，可以从安全位置输出','一技能法阵减速后接大招更容易命中','被动普攻穿透可以一次打多个目标清线极快','二技能护盾加速可以快速转线支援','蓄力大招时自己不能动，注意释放时机和位置']
+  }},
+  {name:'甄姬',role:'mage',emoji:'🔮',label:'法师',detail:{
+    title:'洛水之誓 · 甄姬',subtitle:'水波涟漪，弹射控杀',difficulty:'★★☆☆☆',position:'中路',tier:'T2',
+    skills:[
+      {name:'凝波（被动）',desc:'甄姬技能命中敌人叠加印记，3层触发冰冻效果。弹射+冰冻是她团控的基础。'},
+      {name:'洛水清波（一技能）',desc:'甄姬向指定方向推出水波，对命中敌人造成法术伤害并弹射到附近敌人。弹射机制是甄姬核心。'},
+      {name:'洛神降临（二技能）',desc:'甄姬在指定位置召唤水流，对范围内敌人造成法术伤害和减速。范围控制技能。'},
+      {name:'洛水秋波（三技能）',desc:'甄姬召唤巨大水浪，对范围内敌人造成法术伤害并将他们推向中心，同时附加冰冻。毁天灭地的团控。'}
+    ],
+    builds:[
+      {name:'秘法之靴',desc:'法穿鞋提升伤害'},
+      {name:'痛苦面具',desc:'法穿+被动百分比伤害'},
+      {name:'回响之杖',desc:'移速+被动弹射，强化消耗'},
+      {name:'博学者之怒',desc:'法强大件'},
+      {name:'虚无法杖',desc:'百分比法穿'},
+      {name:'辉月',desc:'保命免伤'}
+    ],
+    runes:'红色10梦魇 + 绿色10心眼 + 蓝色10轮回',combos:['2-1-3（减速弹射再推冰冻）','1-3-2（弹射推聚再水流控）','3-1-2（大招推聚接弹射和水流）'],
+    tips:['一技能弹射可以弹3个目标，人越密集弹射伤害越高','被动3层冰冻配合弹射可以连续冰冻多人','大招推聚效果让对面挤在一起，再接弹射伤害爆炸','站位靠后输出，甄姬自身非常脆弱','团战等对面站位密集时再放大招收益最大']
+  }},
+  {name:'黄忠',role:'archer',emoji:'🏹',label:'射手',detail:{
+    title:'燃魂重炮 · 黄忠',subtitle:'架炮轰城，寸草不生',difficulty:'★★☆☆☆',position:'发育路',tier:'T2',
+    skills:[
+      {name:'炮手燃魂（被动）',desc:'黄忠普攻命中目标增加暴击率和攻击力，最多叠加5层。越打越猛的持续输出射手。'},
+      {name:'追击（一技能）',desc:'黄忠向前方翻滚并提升移速，同时重置普攻后摇。灵活走位和追击逃命的关键。'},
+      {name:'警戒地雷（二技能）',desc:'黄忠放置地雷，敌人触发后减速并暴露视野，同时黄忠获得护盾。防守和探视野神技。'},
+      {name:'重装炮台（三技能）',desc:'黄忠架起炮台，大幅增加攻击范围和伤害，但无法移动。架炮后化身固定炮台，范围轰炸。'}
+    ],
+    builds:[
+      {name:'急速战靴',desc:'攻速鞋，提升普攻频率'},
+      {name:'无尽战刃',desc:'暴击核心，被动叠加更猛'},
+      {name:'泣血之刃',desc:'物理吸血，站撸续航保障'},
+      {name:'影刃',desc:'暴击后加攻速，攻守兼备'},
+      {name:'破晓',desc:'攻速+穿透，射手后期必备'},
+      {name:'纯净苍穹',desc:'免伤主动，架炮时保命'}
+    ],
+    runes:'红色10祸源 + 绿色10鹰眼 + 蓝色10狩猎',combos:['2-3-A-A-A（地雷架炮持续输出）','1-2-3-A（翻滚地雷架炮追击）','3-A-1-A（架炮输出后翻滚调整）'],
+    tips:['大招架炮后攻击范围极远，可以安全输出但注意不要被切','二技能地雷放在脚下，刺客来切时减速+护盾+视野','一技能翻滚可以重置普攻后摇，输出节奏更流畅','被动5层叠满伤害爆炸，持续输出才是王道','团战架炮位置很关键，要在队友保护范围内']
+  }},
+  {name:'虞姬',role:'archer',emoji:'🌺',label:'射手',detail:{
+    title:'霸王别姬 · 虞姬',subtitle:'箭雨倾泻，风华无双',difficulty:'★★★☆☆',position:'发育路',tier:'T1',
+    skills:[
+      {name:'阵前舞（被动）',desc:'虞姬脱战后下一次普攻强化，射程更远且附带减速。对线消耗的神技。'},
+      {name:'楚歌起（一技能）',desc:'虞姬蓄力后射出强力箭矢，造成物理伤害。蓄力期间移速增加，可提前释放。核心消耗技能。'},
+      {name:'大风来（二技能）',desc:'虞姬获得2秒物理免疫，期间免疫所有物理伤害。射手中的保命天花板。'},
+      {name:'阵前舞（三技能）',desc:'虞姬跳向目标造成物理伤害并眩晕目标，跳跃期间免疫控制。攻守兼备的位移+控制。'}
+    ],
+    builds:[
+      {name:'急速战靴',desc:'攻速鞋，提升输出频率'},
+      {name:'无尽战刃',desc:'暴击核心装'},
+      {name:'泣血之刃',desc:'吸血续航'},
+      {name:'影刃',desc:'暴击攻速装，被动触发更猛'},
+      {name:'破晓',desc:'穿透装，打坦克必备'},
+      {name:'名刀·司命',desc:'保命装，二技能用完还有兜底'}
+    ],
+    runes:'红色10祸源 + 绿色10鹰眼 + 蓝色10狩猎',combos:['1-A-3-A-2-A（消耗跳斩免伤输出）','3-A-1-A-2-A（跳斩输出接消耗）','A-2-1-3-A（被动起手免伤反击）'],
+    tips:['二技能物理免疫是核心，对物理刺客几乎克死','二技能要捏在手里等对面爆发时用，别随便放','大招跳跃期间免控，可以用来躲关键控制','一技能蓄力射程很远，可以在安全位置消耗','注意二技能只免疫物理伤害，法师伤害照吃']
+  }},
+  {name:'马可波罗',role:'archer',emoji:'🎯',label:'射手',detail:{
+    title:'远游之枪 · 马可波罗',subtitle:'双枪齐射，弹幕如雨',difficulty:'★★★★☆',position:'发育路',tier:'T0',
+    skills:[
+      {name:'连锁反应（被动）',desc:'马可波罗普攻和技能命中敌人叠加印记，10层触发真实伤害。打坦克也痛的核心机制。'},
+      {name:'华丽左轮（一技能）',desc:'马可波罗向指定方向连续射击，造成物理伤害。攻速越高子弹数越多。核心消耗和叠被动技能。'},
+      {name:'漫游之枪（二技能）',desc:'马可波罗向指定方向位移，下一次普攻强化为双枪齐射。灵活走位和输出的关键。'},
+      {name:'狂热弹幕（三技能）',desc:'马可波罗在指定位置持续射击，对范围内敌人造成大量物理伤害。团战核弹级AOE。'}
+    ],
+    builds:[
+      {name:'急速战靴',desc:'攻速鞋，核心中的核心'},
+      {name:'末世',desc:'攻速+百分比伤害，叠被动飞快'},
+      {name:'纯净苍穹',desc:'攻速+免伤主动，进场保命'},
+      {name:'影刃',desc:'暴击攻速，输出频率拉满'},
+      {name:'破晓',desc:'穿透打坦克'},
+      {name:'名刀·司命',desc:'保命兜底'}
+    ],
+    runes:'红色10红月 + 绿色10鹰眼 + 蓝色10狩猎',combos:['1-2-A-1-3（消耗位移再输出放大）','2-A-1-3（位移强化普攻接消耗放大）','3-2-1（大招进场位移调整射击）'],
+    tips:['攻速是马可的生命，攻速阈值决定子弹数量','被动10层真伤是打坦克的资本，一技能快速叠满','大招进场时机很关键，最好等对面控制交完','二技能位移CD短，可以频繁调整位置','一技能消耗距离很远，安全位置疯狂输出']
+  }},
+  {name:'曜',role:'assassin',emoji:'🗡',label:'刺客',detail:{
+    title:'归尘之剑 · 曜',subtitle:'剑随心转，万物归尘',difficulty:'★★★★★',position:'打野',tier:'T1',
+    skills:[
+      {name:'归尘（被动）',desc:'曜释放技能获得星辰之力，3层后强化下一次技能。强化的技能额外造成伤害和效果。资源管理的核心。'},
+      {name:'裂空斩（一技能）',desc:'曜挥剑斩击前方，造成物理伤害。强化版额外造成击飞效果。主要输出和清野技能。'},
+      {name:'逐星（二技能）',desc:'曜向指定方向突进，对路径敌人造成伤害。强化版位移距离更远且伤害更高。核心位移技能。'},
+      {name:'归尘剑诀（三技能）',desc:'曜回到2秒前的位置，对路径敌人造成法术伤害。强化版回到位置更远且回复更多生命值。神级操作技能。'}
+    ],
+    builds:[
+      {name:'追击刀锋',desc:'打野刀，叠加攻速冷却'},
+      {name:'抵抗之靴',desc:'减控确保连招流畅'},
+      {name:'暗影战斧',desc:'冷却穿透生命，战士刺客万金油'},
+      {name:'宗师之力',desc:'强化普攻配合技能爆发'},
+      {name:'破军',desc:'对低血量目标增伤，秒杀核心'},
+      {name:'名刀·司命',desc:'保命装，操作失误还有机会'}
+    ],
+    runes:'红色10异变 + 绿色10鹰眼 + 蓝色10隐匿',combos:['2-1-A-3（突进输出回溯，无伤消耗）','1-2-A-3-A（击飞突进输出回溯追击）','3-2-1-A（回溯突进输出追杀）'],
+    tips:['三技能回到2秒前位置是这个英雄的灵魂，操作空间极大','被动3层强化技能是爆发关键，注意管理星辰层数','回溯时回复生命值，残血回溯经常能反杀','连招后用三技能安全撤离，无伤消耗是曜的招牌','操作难度很高但回报极大，多练肌肉记忆是关键']
+  }},
+  {name:'李白',role:'assassin',emoji:'🍃',label:'刺客',detail:{
+    title:'青莲剑仙 · 李白',subtitle:'十步杀一人，千里不留行',difficulty:'★★★★☆',position:'打野',tier:'T1',
+    skills:[
+      {name:'侠客行（被动）',desc:'李白普攻命中敌人积累剑气，4道剑气后解锁大招。大招的封印机制让李白需要在攻击中积累才能释放。'},
+      {name:'将进酒（一技能）',desc:'李白向指定方向突进，对路径敌人造成伤害和眩晕。5秒内可再次释放，第三次回到原位。灵活的三段位移。'},
+      {name:'神来之笔（二技能）',desc:'李白以自身为中心画剑阵，对范围内敌人造成伤害和减速，剑阵边缘的敌人额外受到减速。'},
+      {name:'青莲剑歌（三技能）',desc:'李白化身剑仙，在指定区域造成5次物理伤害，期间不可被选中。核心爆发技能。'}
+    ],
+    builds:[
+      {name:'追击刀锋',desc:'打野刀，冷却和攻速'},
+      {name:'急速战靴',desc:'攻速更快叠被动'},
+      {name:'暗影战斧',desc:'冷却穿透生命'},
+      {name:'泣血之刃',desc:'吸血续航，打野回血'},
+      {name:'破军',desc:'低血量增伤，秒杀核心'},
+      {name:'名刀·司命',desc:'保命兜底'}
+    ],
+    runes:'红色10异变 + 绿色10鹰眼 + 蓝色10狩猎',combos:['1-A-1-A-2-3-A（两段位移叠被动开大）','A-A-1-2-3（普攻叠被动进场开大）','1-1-2-3-1（三段位移穿插大招追杀）'],
+    tips:['必须先叠4层剑气才能开大，野区小怪是好的叠层工具','一技能三段位移非常灵活，第三段回原位可以安全撤离','大招释放期间不可被选中，可以用来躲避致命伤害','二技能画圈减速留人，边缘额外减速更难跑','连招节奏很重要，空大就是没伤害的脆皮']
+  }},
+  {name:'韩信',role:'assassin',emoji:'🌙',label:'刺客',detail:{
+    title:'国士无双 · 韩信',subtitle:'背水一战，兵仙降世',difficulty:'★★★★☆',position:'打野',tier:'T1',
+    skills:[
+      {name:'无双（被动）',desc:'韩信第四次普攻击飞目标，技能命中增加攻速。普攻和技能交织是韩信的操作核心。'},
+      {name:'无情冲锋（一技能）',desc:'韩信向指定方向冲锋，对路径敌人造成伤害和击飞。4秒内可再次释放。双段位移是韩信的灵魂。'},
+      {name:'背水一战（二技能）',desc:'韩信向后跳跃，下一次普攻强化为横扫，造成范围伤害。反向位移+强化普攻，独特的操作逻辑。'},
+      {name:'国士无双（三技能）',desc:'韩信乱舞长枪，对范围内敌人造成多段伤害，最后一击击飞敌人。近身爆发技能。'}
+    ],
+    builds:[
+      {name:'追击刀锋',desc:'打野刀，攻速和冷却'},
+      {name:'急速战靴',desc:'攻速鞋叠被动更快'},
+      {name:'暗影战斧',desc:'冷却穿透生命'},
+      {name:'无尽战刃',desc:'暴击核心，强化普攻更猛'},
+      {name:'宗师之力',desc:'强化普攻配合二技能爆发'},
+      {name:'名刀·司命',desc:'保命装容错'}
+    ],
+    runes:'红色10祸源 + 绿色10鹰眼 + 蓝色10狩猎',combos:['2-A-1-A-3-A（横扫冲锋普攻大招连招）','1-A-1-A-3-A-2（双冲锋接大招横扫收割）','1-2-A-3（冲锋突进横扫爆发）'],
+    tips:['二技能是反向跳跃，新手容易跳反方向，一定要多练','一技能双段位移可以穿墙追人也可以穿墙逃跑','被动第4次击飞是额外的控制，注意穿插普攻','韩信非常脆，进场必须秒人否则自己先死','打野Gank速度极快，利用位移穿墙出其不意']
+  }},
+  {name:'孙悟空',role:'assassin',emoji:'🐒',label:'刺客',detail:{
+    title:'齐天大圣 · 孙悟空',subtitle:'棍影千变，破阵杀神',difficulty:'★★★☆☆',position:'打野',tier:'T1',
+    skills:[
+      {name:'大圣神威（被动）',desc:'每次释放技能后强化下一次普攻，附带位移效果并造成额外物理伤害。孙悟空的灵巧之源，也是连招节奏的核心。'},
+      {name:'护身咒法（一技能）',desc:'孙悟空念起护身咒，为自己提供护盾并获得短暂免伤效果，同时移除自身控制效果。关键时刻的保命神技。'},
+      {name:'定身术（二技能）',desc:'孙悟空朝指定方向冲刺，对路径上敌人造成物理伤害。命中敌方英雄后可再次释放，是进场和追击的核心位移。'},
+      {name:'棒击大地（三技能）',desc:'孙悟空将金箍棒变大直击大地，对范围内敌人造成物理伤害并将其击飞。核心开团和控制技能，配合二技能进场可瞬间打乱阵型。'}
+    ],
+    builds:[
+      {name:'追击刀锋',desc:'打野必备，叠加攻速和冷却'},
+      {name:'急速战靴',desc:'攻速加成，提升普攻频率'},
+      {name:'无尽战刃',desc:'暴击核心，猴三棒爆发之源'},
+      {name:'宗师之力',desc:'强化普攻，技能后普攻伤害翻倍'},
+      {name:'碎星锤',desc:'百分比护甲穿透，打坦克利器'},
+      {name:'名刀·司命',desc:'残血免死一次，容错率保障'}
+    ],
+    runes:'红色10祸源 + 绿色10鹰眼 + 蓝色10狩猎',combos:['2-A-3-A-1-A（经典三棒秒杀连招）','2-3-A-1-A-2（双位移追击连招）','1-2-A-3-A（先手开团连招）'],
+    tips:[
+      '利用被动强化普攻的位移穿墙，可打出意想不到的绕后Gank',
+      '二技能命中英雄后可二次位移，追杀和逃跑都非常灵活',
+      '一技能的解控+护盾是保命关键，不要浪费在无控对拼中',
+      '团战先手三技能击飞多个目标，再接强化普攻逐个收割',
+      '后期名刀触发后立刻一技能护盾续命，经常能丝血反杀'
+    ]
+  }},
+  {name:'蔡文姬',role:'support',emoji:'🎵',label:'辅助',detail:{
+    title:'奇迹旋律 · 蔡文姬',subtitle:'琴音治愈，守护众生',difficulty:'★☆☆☆☆',position:'辅助',tier:'T1',
+    skills:[
+      {name:'长歌行（被动）',desc:'蔡文姬受到伤害时自动增加移速并回复自身生命值。自保能力很强，不容易被秒。'},
+      {name:'忘忧曲（一技能）',desc:'蔡文姬弹奏乐曲，为自身和附近血量最低的友方回复生命值。核心治疗技能。'},
+      {name:'胡笳十八拍（二技能）',desc:'蔡文姬弹奏胡笳音波，对敌人造成法术伤害和减速，音波在敌人间弹射。消耗和控制兼备。'},
+      {name:'忘忧引（三技能）',desc:'蔡文姬为周围友方提供大量回复和移速加成，持续5秒。团战保人神技。'}
+    ],
+    builds:[
+      {name:'冷静之靴',desc:'冷却缩减，奶量更频繁'},
+      {name:'极寒风暴',desc:'护甲冷却，近身辅助必备'},
+      {name:'救赎之翼',desc:'主动护盾，保护后排'},
+      {name:'不死鸟之眼',desc:'低血量增疗+法防'},
+      {name:'霸者重装',desc:'大量生命值，奶量更高'},
+      {name:'贤者之书',desc:'法强提升治疗量'}
+    ],
+    runes:'红色10圣人 + 绿色10均衡 + 蓝色10调和',combos:['2-1-3（减速奶人加速全家桶）','3-1-2（加速治疗减速敌人）','1-2-3（治疗减速大奶保人）'],
+    tips:['大招5秒持续回血+加速是团战神器，关键时刻释放','二技能弹射在站密集敌人中效果极好','始终站在后排身边保人，不要冲前面','注意蓝量，没蓝的蔡文姬就是超级兵','被动受击加速让你不容易被追杀']
+  }},
+  {name:'妲己',role:'support',emoji:'🦊',label:'辅助',detail:{
+    title:'魅惑之狐 · 妲己',subtitle:'倾国倾城，一念倾城',difficulty:'★☆☆☆☆',position:'辅助',tier:'T2',
+    skills:[
+      {name:'失心（被动）',desc:'妲己技能命中敌人降低其法术防御，最多叠加3层。越打越痛的法师，后期一个二技能脆皮就半血。'},
+      {name:'灵魂冲击（一技能）',desc:'妲己释放灵魂冲击波，对前方敌人造成法术伤害。清线和消耗的主技能。'},
+      {name:'偶人术（二技能）',desc:'妲己抛出魅惑偶人，对指定方向敌人造成法术伤害并眩晕1.5秒。核心控制技能。'},
+      {name:'女王崇拜（三技能）',desc:'妲己释放5道心灵冲击，每道造成法术伤害。命中同一目标伤害递减。秒人核弹。'}
+    ],
+    builds:[
+      {name:'秘法之靴',desc:'法穿鞋，配合被动更痛'},
+      {name:'回响之杖',desc:'移速+被动弹射，二技能后爆炸'},
+      {name:'博学者之怒',desc:'法强核心'},
+      {name:'虚无法杖',desc:'百分比法穿'},
+      {name:'辉月',desc:'保命免伤'},
+      {name:'贤者之书',desc:'法强终极装备'}
+    ],
+    runes:'红色10梦魇 + 绿色10心眼 + 蓝色10轮回',combos:['2-3-1（眩晕大招消耗经典秒人）','2-1-3（眩晕消耗补大招收割）','1-2-3（消耗眩晕再秒）'],
+    tips:['二技能眩晕是大招命中的前提，一定要先手眩晕','被动减法防3层后伤害爆炸，一个技能半管血','蹲草是妲己的灵魂，草丛里2-3-1一套秒脆皮','大招多段伤害命中同一人递减，注意不要浪费','自身非常脆弱，打出技能就后撤等CD']
+  }},
+  {name:'太乙真人',role:'support',emoji:'☁️',label:'辅助',detail:{
+    title:'封神之引 · 太乙真人',subtitle:'炼金不朽，逆天改命',difficulty:'★★★☆☆',position:'辅助',tier:'T0',
+    skills:[
+      {name:'金光咒（被动）',desc:'太乙真人附近友方英雄额外获得金币。跟着射手走就是天然经济优势。'},
+      {name:'炼金术（一技能）',desc:'太乙真人向指定方向推出炼金炸弹，对敌人造成法术伤害和减速。蓄力后伤害和范围增大。'},
+      {name:'天雷引（二技能）',desc:'太乙真人召唤天雷，对指定区域敌人造成法术伤害和眩晕。AOE控制技能。'},
+      {name:'大变活人（三技能）',desc:'太乙真人保护附近一名友方英雄，该英雄死亡时立即复活并回复生命值。全游戏最强保人技能。'}
+    ],
+    builds:[
+      {name:'冷静之靴',desc:'冷却缩减，大招CD更短'},
+      {name:'极寒风暴',desc:'护甲冷却，辅助标配'},
+      {name:'救赎之翼',desc:'护盾保护队友'},
+      {name:'霸者重装',desc:'大量生命值'},
+      {name:'不死鸟之眼',desc:'法防+增疗'},
+      {name:'近卫荣耀',desc:'团队增益辅助装'}
+    ],
+    runes:'红色10圣人 + 绿色10均衡 + 蓝色10调和',combos:['1-2-3（减速眩晕复活保人）','2-1-3（眩晕消耗再保护）','1（蓄力）-2-3（蓄力炸弹接控制保人）'],
+    tips:['大招复活是全游戏最强保人技能，一定要给对的人','被动给队友加金币，跟着射手保发育很重要','一技能蓄力伤害和范围增大，蓄满再放收益高','二技能眩晕是开团和保人双用技能','大招CD较长，注意在关键团战时留好']
+  }},
+  {name:'刘禅',role:'tank',emoji:'🐉',label:'坦克',detail:{
+    title:'暴走机关 · 刘禅',subtitle:'机关暴走，推塔狂魔',difficulty:'★★☆☆☆',position:'辅助',tier:'T2',
+    skills:[
+      {name:'磁力屏障（被动）',desc:'刘禅技能命中防御塔时对塔造成等量伤害并回复自身生命值。推塔狂魔的资本。'},
+      {name:'小霸王护盾（一技能）',desc:'刘禅开启护盾并向前冲锋，对敌人造成伤害和击飞。开团和保人双用技能。'},
+      {name:'机关魔爪（二技能）',desc:'刘禅操控魔爪抓取前方敌人，造成伤害和眩晕。单体控制技能。'},
+      {name:'暴走磁场（三技能）',desc:'刘禅释放磁场对周围敌人造成持续伤害，期间获得免伤。越兵线对拼的神技。'}
+    ],
+    builds:[
+      {name:'抵抗之靴',desc:'减控确保技能释放'},
+      {name:'极寒风暴',desc:'护甲冷却核心'},
+      {name:'魔女斗篷',desc:'法防装备'},
+      {name:'不祥征兆',desc:'减速攻速高护甲'},
+      {name:'霸者重装',desc:'大量生命值'},
+      {name:'血魔之怒',desc:'低血量增伤护盾'}
+    ],
+    runes:'红色10宿命 + 绿色10均衡 + 蓝色10调和',combos:['1-2-A-3（冲锋眩晕普攻开磁场）','2-1-3（眩晕冲锋接磁场）','1-3-2（冲锋磁场持续输出控制）'],
+    tips:['被动对塔伤害+回血，推塔比兵线还快','一技能冲锋+击飞是开团好技能','二技能眩晕留人配合射手输出','大招磁场范围持续伤害+免伤，贴脸换血不亏','跟着射手推塔拿龙，刘禅的节奏就是推推推']
+  }},
+  {name:'张飞',role:'tank',emoji:'🥊',label:'坦克',detail:{
+    title:'万夫之勇 · 张飞',subtitle:'一声怒吼，万夫莫敌',difficulty:'★★★☆☆',position:'辅助',tier:'T1',
+    skills:[
+      {name:'据水断桥（被动）',desc:'张飞普攻命中英雄增加豪气，满豪气后强化技能。越打越猛的坦克。'},
+      {name:'蛇矛突刺（一技能）',desc:'张飞向指定方向突刺，对敌人造成伤害和减速。强化版突刺距离更远伤害更高。'},
+      {name:'虎啸震天（二技能）',desc:'张飞怒吼，对周围敌人造成伤害和恐惧效果。强化版恐惧时间更长。核心团控技能。'},
+      {name:'万人敌（三技能）',desc:'张飞进入狂暴状态，大幅增加攻击力和免伤，持续8秒。变身后的张飞攻防一体。'}
+    ],
+    builds:[
+      {name:'抵抗之靴',desc:'减控确保怒吼释放'},
+      {name:'极寒风暴',desc:'护甲冷却坦克核心'},
+      {name:'魔女斗篷',desc:'法防装备'},
+      {name:'不祥征兆',desc:'减攻速高护甲'},
+      {name:'霸者重装',desc:'大量生命值'},
+      {name:'血魔之怒',desc:'变身时增伤+护盾更猛'}
+    ],
+    runes:'红色10宿命 + 绿色10均衡 + 蓝色10调和',combos:['1-2-3-A-A（突刺恐惧变身输出）','2-1-3-A（先恐惧再突刺变身打）','3-2-1-A（变身恐惧突刺连打）'],
+    tips:['二技能恐惧是核心团控，恐惧期间对面无法操作','被动满豪气强化技能，一定要先叠满再开团','大招变身8秒攻防大幅提升，变身期就是强势期','变身期间伤害也不低，不要只会挨打','团战怒吼恐惧多人，变身后的张飞是战场主宰']
+  }},
+  {name:'白起',role:'tank',emoji:'🪨',label:'坦克',detail:{
+    title:'最终兵器 · 白起',subtitle:'以战止战，万军辟易',difficulty:'★★☆☆☆',position:'对抗路',tier:'T1',
+    skills:[
+      {name:'反击之镰（被动）',desc:'白起受伤时有概率旋转镰刀对周围敌人造成物理伤害。挨打也有输出，越被集火越疼。'},
+      {name:'血之回响（一技能）',desc:'白起向指定方向挥出镰刀，对路径敌人造成物理伤害和减速，命中英雄回复自身生命值。消耗+续航一体。'},
+      {name:'死神之镰（二技能）',desc:'白起向指定方向推出镰刀，将路径上的敌人拉向自己。核心开团拉人技能。'},
+      {name:'傲慢嘲讽（三技能）',desc:'白起嘲讽周围敌方英雄，使其强制普攻自己，持续2秒。全游戏最强嘲讽技能。'}
+    ],
+    builds:[
+      {name:'抵抗之靴',desc:'减控确保嘲讽释放'},
+      {name:'红莲斗篷',desc:'灼烧+护甲，被动触发更频繁'},
+      {name:'魔女斗篷',desc:'法防装备'},
+      {name:'不祥征兆',desc:'减攻速+高护甲'},
+      {name:'霸者重装',desc:'大量生命值更耐揍'},
+      {name:'反伤刺甲',desc:'反弹伤害，挨打输出更高'}
+    ],
+    runes:'红色10宿命 + 绿色10均衡 + 蓝色10调和',combos:['2-3-1（拉人嘲讽收割）','1-2-3（消耗拉人嘲讽）','3-2-1（先嘲讽再拉人消耗）'],
+    tips:['大招嘲讽是全游戏最强控制之一，强制对面打你','二技能拉人配合嘲讽，拉过来就跑不掉','被动挨打反击让白起越被集火伤害越高','出纯肉就好，你的伤害来自被动和挨打','嘲讽给对面C位，让他们打你2秒给队友创造机会']
+  }},
+  {name:'元流之子·刺客',role:'assassin',emoji:'🌀',label:'刺客',detail:{
+    title:'元流之子 · 刺客形态',subtitle:'流光掠影，万刃归一',difficulty:'★★★★☆',position:'打野',tier:'T1',
+    skills:[
+      {name:'流光残影（被动）',desc:'消耗"流"能量强化普攻，造成目标已损生命值百分比伤害。残局收割能力极强，血量越低伤害越恐怖。'},
+      {name:'破流斩（一技能）',desc:'获得"流"能量并击飞敌人，同时减少其他技能冷却时间。核心能量管理和起手控制技能。'},
+      {name:'幻流穿梭（二技能）',desc:'多段位移穿梭，可穿越薄墙，主要输出手段。高机动性让元流之子在战场中来去自如。'},
+      {name:'千刃归宗（三技能）',desc:'远距离突进技能，突进期间不可被选中。施法前摇较长，需要预判时机，但命中后爆发极高。'}
+    ],
+    builds:[
+      {name:'追击刀锋',desc:'打野刀，攻速冷却叠加'},
+      {name:'抵抗之靴',desc:'减控保证连招流畅'},
+      {name:'暗影战斧',desc:'冷却穿透生命，刺客核心'},
+      {name:'无尽战刃',desc:'暴击加成强化普攻'},
+      {name:'碎星锤',desc:'护甲穿透打坦克'},
+      {name:'幽影袖箭',desc:'S43新装备！隐身保命+回血，刺客进场后安全撤离'}
+    ],
+    runes:'红色10异变 + 绿色10鹰眼 + 蓝色10隐匿',combos:['1-2-A-3-A（击飞穿梭强化大招收割）','2-A-1-2-A-3（穿梭输出击飞再穿梭大招收割）','3-2-A-1-A（远距离突进穿梭输出收割）'],
+    tips:['该英雄可免费获取，完成活动即可解锁','被动对低血量目标伤害极高，适合残局收割','二技能多段位移可穿墙，Gank路线非常灵活','三技能前摇较长，需要预判对面走位再释放','S43新召唤师技能「汇流成兵」可为刺客召唤双爪，配合度极高']
+  }},
+  {name:'赵云',role:'warrior',emoji:'🐉',label:'战士',detail:{
+    title:'常山之龙 · 赵云',subtitle:'七进七出，龙胆无双',difficulty:'★★☆☆☆',position:'打野',tier:'T2',
+    skills:[
+      {name:'龙鸣（被动）',desc:'赵云每损失一定生命值获得免伤效果，血量越低免伤越高。残血反杀的底气。'},
+      {name:'惊雷之龙（一技能）【S43削弱】',desc:'赵云向指定方向冲锋，对路径敌人造成物理伤害。S43基础伤害降低50-100点，额外AD加成减少20%，前期刷野和爆发能力下降。'},
+      {name:'天翔之龙（二技能）【S43削弱】',desc:'赵云跃向指定位置，对范围内敌人造成多段物理伤害并击飞。S43五段伤害共减少50-100点，整体输出下降。'},
+      {name:'龙影突袭（三技能）',desc:'赵云化身龙影连续冲刺，对路径敌人造成物理伤害。灵活的位移+输出大招。'}
+    ],
+    builds:[
+      {name:'追击刀锋',desc:'打野刀，攻速和冷却'},
+      {name:'抵抗之靴',desc:'减控确保进场'},
+      {name:'暗影战斧',desc:'冷却穿透生命'},
+      {name:'宗师之力',desc:'强化普攻配合技能爆发'},
+      {name:'破军',desc:'对低血量增伤，秒杀核心'},
+      {name:'名刀·司命',desc:'S43重做可升级！满级1.75秒无敌'}
+    ],
+    runes:'红色10异变 + 绿色10鹰眼 + 蓝色10隐匿',combos:['1-2-A-3-A（冲锋击飞普攻大招连招）','2-3-A-1-A（跳斩大招再冲锋收割）','1-A-2-A-3（冲锋输出击飞输出大招）'],
+    tips:['S43削弱了一二技能基础伤害，前期刷野变慢','被动残血免伤是赵云的底气，不要满血就怂','一技能冲锋距离很远，穿墙Gank出其不意','二技能击飞是核心控制，配合队友输出很稳','名刀S43可升级，后期的赵云容错率更高']
+  }},
+];
+
+const roleColors = {
+  warrior:'linear-gradient(135deg,rgba(180,74,255,.25),rgba(180,74,255,.08))',
+  mage:'linear-gradient(135deg,rgba(0,212,255,.2),rgba(0,212,255,.06))',
+  archer:'linear-gradient(135deg,rgba(0,200,100,.2),rgba(0,180,80,.06))',
+  assassin:'linear-gradient(135deg,rgba(255,45,120,.2),rgba(255,45,120,.06))',
+  support:'linear-gradient(135deg,rgba(255,215,0,.2),rgba(255,180,0,.06))',
+  tank:'linear-gradient(135deg,rgba(100,180,255,.2),rgba(80,160,255,.06))',
+};
+
+function renderHeroes(role) {
+  const grid = document.getElementById('heroesGrid');
+  const list = role === 'all' ? heroData : heroData.filter(h => h.role === role);
+  grid.innerHTML = list.map((h, i) => `
+    <div class="hero-chip" onclick="${h.detail ? `openHeroModal(${heroData.indexOf(h)})` : `showToast('🦸 ${h.name} · ${h.label}攻略')`}">
+      <div class="hc-avatar" style="background:${roleColors[h.role]}">${h.emoji}</div>
+      <div class="hc-name">${h.name}</div>
+      <div class="hc-role-label">${h.label}</div>
+    </div>
+  `).join('');
+}
+
+/* 角色Tab切换 */
+document.addEventListener('click', e => {
+  const tab = e.target.closest('.role-tab');
+  if (!tab) return;
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  renderHeroes(tab.dataset.role);
+});
+
+/* ========== 道具筛选 ========== */
+function filterItems(btn, rarity) {
+  document.querySelectorAll('.ifilter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // 只筛选隐藏道具页面内的道具卡片（排除BOSS攻略页面的战场改动卡片）
+  const page = document.getElementById('page-items');
+  if (page) {
+    page.querySelectorAll('.item-card').forEach(card => {
+      card.style.display = (rarity === 'all' || card.dataset.rarity === rarity) ? '' : 'none';
+    });
+  }
+  showToast(rarity === 'all' ? '📦 显示全部道具' : `🔍 筛选：${btn.textContent}`);
+}
+
+/* ========== 初始化 ========== */
+
+/* ========== 英雄详情弹窗 ========== */
+function openHeroModal(idx) {
+  const h = heroData[idx];
+  if (!h || !h.detail) { showToast('🦸 ' + h.name + ' · ' + h.label + '攻略'); return; }
+  const d = h.detail;
+  const modal = document.getElementById('heroModal');
+  const content = document.getElementById('heroModalContent');
+
+  content.innerHTML = `
+    <div class="hm-header">
+      <div class="hm-avatar">${h.emoji}</div>
+      <div class="hm-info">
+        <div class="hm-title">${d.title}</div>
+        <div class="hm-subtitle">${d.subtitle}</div>
+        <div class="hm-tags">
+          <span class="hm-tag role">${d.position}</span>
+          <span class="hm-tag tier">强度 ${d.tier}</span>
+          <span class="hm-tag diff">操作 ${d.difficulty}</span>
+        </div>
+      </div>
+      <button class="hm-close" onclick="closeHeroModal()">✕</button>
+    </div>
+    <div class="hm-body">
+      <div class="hm-section">
+        <div class="hm-section-title">技能详解</div>
+        ${d.skills.map(s => `
+          <div class="hm-skill">
+            <div class="hm-skill-name">${s.name}</div>
+            <div class="hm-skill-desc">${s.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">推荐出装</div>
+        <div class="hm-builds">
+          ${d.builds.map((b,i) => `
+            <div class="hm-build-item">
+              <div class="hm-build-num">${i+1}</div>
+              <div class="hm-build-text">
+                <div class="hm-build-name">${b.name}</div>
+                <div class="hm-build-desc">${b.desc}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">铭文搭配</div>
+        <div class="hm-rune-box">
+          ${d.runes}
+          <br><span>攻速+16% · 暴击率+16% · 物理穿透+64 · 移速+10%</span>
+        </div>
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">核心连招</div>
+        <div class="hm-combos">
+          ${d.combos.map((c,i) => `
+            <div class="hm-combo">
+              <div class="hm-combo-num">${i+1}</div>
+              <div class="hm-combo-text">${c}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">实战技巧</div>
+        <div class="hm-tips">
+          ${d.tips.map(t => `
+            <div class="hm-tip">
+              <div class="hm-tip-icon">💡</div>
+              <div>${t}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeHeroModal() {
+  document.getElementById('heroModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ========== S43赛季T0排行榜弹窗 ========== */
+function showTierList() {
+  const modal = document.getElementById('heroModal');
+  const content = document.getElementById('heroModalContent');
+  content.innerHTML = `
+    <div class="hm-header">
+      <div class="hm-avatar" style="background:linear-gradient(135deg,rgba(255,215,0,.25),rgba(255,215,0,.08));border-color:rgba(255,215,0,0.4);box-shadow:0 0 20px rgba(255,215,0,0.15)">🏆</div>
+      <div class="hm-info">
+        <div class="hm-title" style="background:linear-gradient(90deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">S43赛季T0英雄排行</div>
+        <div class="hm-subtitle">陌上相逢 · 五路版本之子推荐</div>
+        <div class="hm-tags">
+          <span class="hm-tag tier">S43赛季</span>
+          <span class="hm-tag" style="border-color:rgba(255,215,0,0.3);color:var(--gold)">大数据胜率验证</span>
+        </div>
+      </div>
+      <button class="hm-close" onclick="closeHeroModal()">✕</button>
+    </div>
+    <div class="hm-body">
+      <div class="hm-section">
+        <div class="hm-section-title">对抗路 T0</div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:var(--gold)">⚔️ 亚瑟</div><div class="hm-skill-desc">S43一技能空放位移穿墙加强，机动性质变，对抗路制霸。被动回血+沉默+穿墙追击，上分首选。</div></div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:var(--neon-purple)">⚔️ 程咬金</div><div class="hm-skill-desc">S43大招新增击飞效果，开团能力质变。配合不死鸟残血战神，又肉又有控。</div></div>
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">打野 T0</div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:var(--gold)">🗡 云缨</div><div class="hm-skill-desc">S43赛季打野一姐，多段位移+高爆发+强控，Gank效率极高，团战收割能力突出。</div></div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:var(--neon-blue)">🗡 元流之子·刺客</div><div class="hm-skill-desc">S43新英雄，双爪武器+多段位移+被动残血收割，免费获取，版本强势打野。</div></div>
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">中路 T0</div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:var(--gold)">🔮 元法</div><div class="hm-skill-desc">S43重做加强，配合回响之杖加强回归，法师一姐实至名归。爆发+控制+消耗全能。</div></div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:var(--neon-purple)">🔮 貂蝉</div><div class="hm-skill-desc">被动真伤+大招内无限位移，操作上限极高，S43依然稳坐法师前列。</div></div>
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">游走 T0</div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:var(--gold)">🛡 大禹</div><div class="hm-skill-desc">S43赛季游走位T0，控制+保人+开团一体，配合新召唤师技能汇流成兵更强。</div></div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:var(--neon-blue)">🛡 太乙真人</div><div class="hm-skill-desc">大招复活依然是全游戏最强保人技能，被动加金币跟射手保发育。</div></div>
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">发育路 T0</div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:var(--gold)">🏹 孙权</div><div class="hm-skill-desc">S43赛季发育路版本之子，新装备幽影袖箭完美契合，隐身保命+输出收割。</div></div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:var(--neon-purple)">🏹 马可波罗</div><div class="hm-skill-desc">被动真伤+高机动性，幽影袖箭进场后隐身撤离，生存和输出双重保障。</div></div>
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">S43英雄调整速览</div>
+        <div class="hm-tip"><div class="hm-tip-icon">⬆️</div><div><strong style="color:var(--neon-blue)">加强</strong>：亚瑟（穿墙位移）、程咬金（大招击飞）、元法（重做）、廉颇（战士转型）</div></div>
+        <div class="hm-tip"><div class="hm-tip-icon">⬇️</div><div><strong style="color:#ff6666">削弱</strong>：赵云（一二技能伤害降低）、云缨（部分数值微调）</div></div>
+        <div class="hm-tip"><div class="hm-tip-icon">🆕</div><div><strong style="color:var(--neon-purple)">新增</strong>：元流之子·刺客（免费获取）、新召唤师技能「汇流成兵」</div></div>
+      </div>
+    </div>
+  `;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+/* ========== 王者农场 & 小屋弹窗 ========== */
+function showFarmGuide() {
+  const modal = document.getElementById('heroModal');
+  const content = document.getElementById('heroModalContent');
+  content.innerHTML = `
+    <div class="hm-header">
+      <div class="hm-avatar" style="background:linear-gradient(135deg,rgba(0,200,80,.25),rgba(0,200,80,.08));border-color:rgba(0,200,80,0.4);box-shadow:0 0 20px rgba(0,200,80,0.15)">🌾</div>
+      <div class="hm-info">
+        <div class="hm-title" style="background:linear-gradient(90deg,#00c850,#88ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent">王者农场 & 小屋系统</div>
+        <div class="hm-subtitle">S43赛季休闲玩法完全指南</div>
+        <div class="hm-tags">
+          <span class="hm-tag" style="border-color:rgba(0,200,80,0.4);color:#00c850">S43新增</span>
+          <span class="hm-tag" style="border-color:rgba(255,215,0,0.3);color:var(--gold)">休闲玩法</span>
+        </div>
+      </div>
+      <button class="hm-close" onclick="closeHeroModal()">✕</button>
+    </div>
+    <div class="hm-body">
+      <div class="hm-section">
+        <div class="hm-section-title">🌱 王者农场</div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:#00c850">种菜偷菜回归！</div><div class="hm-skill-desc">S43赛季王者农场玩法上线，在自己的农场中种植各类作物，成熟后收获获得奖励。还能去好友农场偷菜，经典的社交互动回归！</div></div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:#00c850">作物成长系统</div><div class="hm-skill-desc">不同作物成长时间不同，稀有作物产出更丰厚的奖励。合理规划种植时间，上线即收菜效率最大化。</div></div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:#00c850">农场装饰</div><div class="hm-skill-desc">解锁各种装饰物美化你的农场，展示个性风格。部分稀有装饰物需要完成特定成就才能解锁。</div></div>
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">🏠 小屋系统</div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:#88ccff">自由装扮</div><div class="hm-skill-desc">S43新增个人小屋系统，自由搭配家具和装饰，打造独一无二的专属空间。不同风格的家具套装可供收集。</div></div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:#88ccff">组队房间展示</div><div class="hm-skill-desc">组队时队友可以参观你的小屋，展示你的装扮成果和收藏品。社交属性拉满！</div></div>
+        <div class="hm-skill"><div class="hm-skill-name" style="color:#88ccff">互动家具</div><div class="hm-skill-desc">部分家具具有互动功能，例如音乐盒播放背景音乐、幸运转盘获取随机小奖励等。</div></div>
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">💡 休闲玩法小贴士</div>
+        <div class="hm-tip"><div class="hm-tip-icon">🌱</div><div>每天记得收菜！稀有作物成熟后限时领取，过期就白种了</div></div>
+        <div class="hm-tip"><div class="hm-tip-icon">🏠</div><div>小屋装扮完成度影响社交展示排名，多收集家具套装</div></div>
+        <div class="hm-tip"><div class="hm-tip-icon">👥</div><div>偷菜是获取稀有种子的途径之一，多加活跃好友</div></div>
+        <div class="hm-tip"><div class="hm-tip-icon">🎁</div><div>部分农场成就奖励含限定头像框和称号，收藏党别错过</div></div>
+      </div>
+    </div>
+  `;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+/* ========== 地图区域详情弹窗 ========== */
+const mapRegionData = {
+  '北区秘境': {
+    desc:'峡谷北区最隐秘的角落，藏有传说级宝物。S43赛季新增防御塔保护机制后，此区域争夺更加激烈。',
+    items:[
+      {name:'蚀月宝珠',rarity:'传说',color:'var(--gold)',desc:'全场仅刷新1次的超稀有道具，拾取后获得持续60秒的20%法术吸血效果，法师英雄的终极增幅。刷新时间：开局8分钟后随机时间出现。'},
+      {name:'炎界圣典',rarity:'史诗',color:'var(--neon-purple)',desc:'拾取后下一次技能命中附带灼烧效果，持续3秒每秒造成法术伤害。适合法师和消耗型英雄。刷新时间：每5分钟。'}
+    ]
+  },
+  '中路秘域': {
+    desc:'中路两侧草丛深处隐藏着强力道具，S43赛季草丛信号同步后，获取道具时队友也能看到你的位置。',
+    items:[
+      {name:'虚空裂缝符',rarity:'隐藏专属',color:'var(--neon-pink)',desc:'S43赛季限定隐藏道具！使用后短暂打开虚空裂缝，2秒内免疫所有控制效果。团战关键保命道具，每场仅出现1次。刷新时间：开局10分钟后。'},
+      {name:'雷霆战核',rarity:'稀有',color:'var(--neon-blue)',desc:'拾取后下一次普攻附带雷电链，弹射至附近3个敌人。适合射手和刺客增强清兵和团战AOE。刷新时间：每4分钟。'}
+    ]
+  },
+  '东侧神殿': {
+    desc:'废弃神殿中沉睡的远古遗物，S43赛季防御塔保护升级后，此区域越塔强杀风险增大。',
+    items:[
+      {name:'不灭守望',rarity:'史诗',color:'var(--neon-purple)',desc:'拾取后获得一次性的30%最大生命值护盾，持续15秒。适合坦克和战士进场开团时拾取，极大增强生存能力。刷新时间：每6分钟。'}
+    ]
+  },
+  '右下祭坛': {
+    desc:'峡谷右下角的神秘祭坛，S43赛季血包共享机制上线后，此区域补给更具战略价值。',
+    items:[
+      {name:'亡者低语',rarity:'隐藏专属',color:'var(--neon-pink)',desc:'隐藏专属道具！拾取后下次死亡时原地复活并回复30%生命值，每场仅出现1次。复活后有3秒无敌时间。刷新时间：开局12分钟后。'}
+    ]
+  },
+  '南部河道': {
+    desc:'南部河道是隐藏道具最密集的区域之一，S43赛季血包共享让河道争夺更具战术深度。',
+    items:[
+      {name:'深潮之力',rarity:'稀有',color:'var(--neon-blue)',desc:'拾取后获得10秒移速加成和穿越单位能力，适合快速转线和追击残血敌人。刷新时间：每3分钟。'},
+      {name:'疾风羽翼',rarity:'稀有',color:'var(--neon-blue)',desc:'拾取后攻速提升25%持续10秒，射手和攻速型刺客在河道争夺此道具收益极大。刷新时间：每3分钟（与深潮之力交替刷新）。'}
+    ]
+  }
+};
+
+function showMapRegion(name) {
+  const data = mapRegionData[name];
+  if (!data) { showToast('📍 ' + name); return; }
+  const modal = document.getElementById('heroModal');
+  const content = document.getElementById('heroModalContent');
+  content.innerHTML = `
+    <div class="hm-header">
+      <div class="hm-avatar" style="background:linear-gradient(135deg,rgba(0,212,255,.25),rgba(0,212,255,.08));border-color:rgba(0,212,255,0.4);box-shadow:0 0 20px rgba(0,212,255,0.15)">🗺</div>
+      <div class="hm-info">
+        <div class="hm-title" style="background:linear-gradient(90deg,var(--neon-blue),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent">${name}</div>
+        <div class="hm-subtitle">S43赛季隐藏道具详情</div>
+        <div class="hm-tags">
+          <span class="hm-tag" style="border-color:rgba(0,212,255,0.4);color:var(--neon-blue)">${data.items.length}件道具</span>
+        </div>
+      </div>
+      <button class="hm-close" onclick="closeHeroModal()">✕</button>
+    </div>
+    <div class="hm-body">
+      <div class="hm-section">
+        <div class="hm-section-title">区域介绍</div>
+        <div class="hm-skill"><div class="hm-skill-desc" style="color:var(--text);line-height:1.8">${data.desc}</div></div>
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">隐藏道具列表</div>
+        ${data.items.map(item => `
+          <div class="hm-skill">
+            <div class="hm-skill-name" style="color:${item.color}">${item.name}<span style="font-size:10px;opacity:.6;margin-left:8px">${item.rarity}</span></div>
+            <div class="hm-skill-desc">${item.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="hm-section">
+        <div class="hm-section-title">S43赛季区域变化</div>
+        <div class="hm-tip"><div class="hm-tip-icon">🛡️</div><div>防御塔保护升级：越塔人数越多减伤越强（最多35%），此区域争夺需更谨慎</div></div>
+        <div class="hm-tip"><div class="hm-tip-icon">❤️</div><div>血包可共享：辅助拾取后可分享给身边队友，河道区域补给更灵活</div></div>
+        <div class="hm-tip"><div class="hm-tip-icon">👁️</div><div>草丛信号同步：信号会同步到小地图，获取道具时队友能更好配合</div></div>
+      </div>
+    </div>
+  `;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+// ESC键关闭弹窗
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeHeroModal();
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  renderHeroes('all');
+  countUp('cnt1', 386, '+');
+  countUp('cnt2', 107, '');
+  countUp('cnt3', 24, '');
+  countUp('cnt4', 3, '万+');
+  observeAll();
+  triggerFadeIn();
+});
+</script>
+</body>
+</html>
